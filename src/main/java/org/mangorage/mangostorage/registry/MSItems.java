@@ -26,12 +26,18 @@ public final class MSItems {
             new Item.Properties()
     ));
 
+    public static final DeferredHolder<Item, Item> TEST_INTERFACE = ITEMS.register("test_interface", () -> new BlockItem(
+            MSBlocks.TEST_INTERFACE_BLOCK.get(),
+            new Item.Properties()
+    ));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(MangoStorage.MODID, () -> CreativeModeTab.builder()
             .icon(() -> new ItemStack(INTERFACE_ITEM.get(), 1))
             .title(Component.translatable("itemGroup." + MangoStorage.MODID))
             .displayItems((p, o) -> {
                 o.accept(INTERFACE_ITEM.get());
                 o.accept(EXPORTER_ITEM.get());
+                o.accept(TEST_INTERFACE.get());
             })
             .build()
     );

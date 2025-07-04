@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.mangostorage.MangoStorage;
 import org.mangorage.mangostorage.world.block.entity.ExporterBlockEntity;
 import org.mangorage.mangostorage.world.block.entity.InterfaceBlockEntity;
+import org.mangorage.mangostorage.world.block.entity.TestInterfaceBlockEntity;
 
 public final class MSBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MangoStorage.MODID);
@@ -21,6 +22,13 @@ public final class MSBlockEntities {
             ExporterBlockEntity::new,
             MSBlocks.EXPORTER_BLOCK.get()
     ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TestInterfaceBlockEntity>> TEST_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("test_interface", () -> BlockEntityType.Builder.of(
+            TestInterfaceBlockEntity::new,
+            MSBlocks.TEST_INTERFACE_BLOCK.get()
+    ).build(null));
+
+
 
 
     public static void register(IEventBus bus) {
