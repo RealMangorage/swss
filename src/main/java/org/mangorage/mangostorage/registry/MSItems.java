@@ -1,6 +1,7 @@
 package org.mangorage.mangostorage.registry;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -26,7 +27,8 @@ public final class MSItems {
     ));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(MangoStorage.MODID, () -> CreativeModeTab.builder()
-            .icon(() -> new ItemStack(Items.BEDROCK, 1))
+            .icon(() -> new ItemStack(INTERFACE_ITEM.get(), 1))
+            .title(Component.translatable("itemGroup." + MangoStorage.MODID))
             .displayItems((p, o) -> {
                 o.accept(INTERFACE_ITEM.get());
                 o.accept(EXPORTER_ITEM.get());
