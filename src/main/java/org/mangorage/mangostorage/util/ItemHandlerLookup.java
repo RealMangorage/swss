@@ -15,18 +15,21 @@ public final class ItemHandlerLookup {
         this.handlers = handlers;
     }
 
-    public Optional<LookupResult> findAny(Item item) {
+    public Optional<LookupResult> findAny(Item item, int amount) {
+        // If Item Max size is less then amount
+        amount = Math.min(amount, item.getDefaultMaxStackSize());
+
         ItemStack lookForItem = item.getDefaultInstance();
         for (IItemHandler handler : handlers) {
             for (int slot = 0; slot < handler.getSlots(); slot++) {
                 if (handler.isItemValid(slot, lookForItem)) {
-                    ItemStack simulated = handler.extractItem(slot, 64, true);
+                    ItemStack simulated = handler.extractItem(slot, amount, true);
                     if (simulated.getItem() == item) {
                         return Optional.of(
                                 new LookupResult(
                                         handler,
                                         slot,
-                                        handler.extractItem(slot, 64, false)
+                                        handler.extractItem(slot, amount, false)
                                 )
                         );
                     }
