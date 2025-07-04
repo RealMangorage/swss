@@ -13,7 +13,6 @@ public final class StorageNetworkManager {
         return Optional.of(instance);
     }
 
-
     public static void start() {
         instance = new StorageNetworkManager();
     }
