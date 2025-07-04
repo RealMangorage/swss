@@ -2,20 +2,23 @@ package org.mangorage.mangostorage.world.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.mangorage.mangostorage.network.INetwork;
+import org.mangorage.mangostorage.network.IRightClickable;
 import org.mangorage.mangostorage.network.ItemDevice;
 import org.mangorage.mangostorage.registry.MSBlockEntities;
 import org.mangorage.mangostorage.util.ItemHandlerLookup;
 
 import java.util.Objects;
 
-public final class ExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity {
+public final class ExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable {
     private int ticks = 0;
     private Item exportItem = Items.AIR;
 
@@ -43,7 +46,7 @@ public final class ExporterBlockEntity extends BaseStorageBlockEntity implements
                                 .toList()
                 );
 
-                lookup.findAny(Items.OAK_PLANKS, 32).ifPresent(result -> {
+                lookup.findAny(exportItem, 32).ifPresent(result -> {
                     result.insert(output);
                 });
 
@@ -51,12 +54,15 @@ public final class ExporterBlockEntity extends BaseStorageBlockEntity implements
         }
     }
 
-
-
     IItemHandler getOutput() {
         BlockPos above = getBlockPos().above();
         BlockState aboveState = level.getBlockState(above);
         BlockEntity aboveEntity = level.getBlockEntity(above);
         return Capabilities.ItemHandler.BLOCK.getCapability(level, above, aboveState, aboveEntity, Direction.DOWN);
+    }
+
+    @Override
+    public void onPlayerClick(ItemStack stack, Player player) {
+        exportItem = stack.getItem();
     }
 }

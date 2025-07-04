@@ -1,6 +1,11 @@
 package org.mangorage.mangostorage.world.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -8,7 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import org.mangorage.mangostorage.network.IRightClickable;
 import org.mangorage.mangostorage.world.block.entity.TickingBlockEntity;
 
 import java.util.function.BiFunction;
@@ -25,6 +32,19 @@ public class StorageBlock extends Block implements EntityBlock {
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         if (function == null) return null;
         return function.apply(blockPos, blockState);
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState p_316362_, Level level, BlockPos blockPos, Player player, InteractionHand p_316595_, BlockHitResult p_316140_) {
+        if (level.isClientSide()) return ItemInteractionResult.CONSUME;
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+
+        if (blockEntity != null && blockEntity instanceof IRightClickable rightClickable) {
+            rightClickable.onPlayerClick(stack, player);
+            return ItemInteractionResult.SUCCESS;
+        } else {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
     }
 
     @Override
