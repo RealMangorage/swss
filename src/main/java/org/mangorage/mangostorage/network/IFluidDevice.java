@@ -1,4 +1,4 @@
 package org.mangorage.mangostorage.network;
 
-public interface IFluidDevice {
+public interface IFluidDevice extends IDevice {
 }

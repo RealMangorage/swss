@@ -1,4 +1,10 @@
 package org.mangorage.mangostorage.network;
 
-public interface ItemDevice {
+import net.neoforged.neoforge.items.IItemHandler;
+
+public interface ItemDevice extends IDevice {
+    IItemHandler getItemHandler();
+
+    boolean canInsert();
+    boolean canExtract();
 }
