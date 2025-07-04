@@ -1,0 +1,4 @@
+package org.mangorage.mangostorage.registry;
+
+public class Items {
+}
