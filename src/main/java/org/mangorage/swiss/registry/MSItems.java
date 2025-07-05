@@ -30,6 +30,13 @@ public final class MSItems {
             new Item.Properties()
     ));
 
+    public static final DeferredHolder<Item, Item> TEST_BLOCK_ITEM = ITEMS.register("test_block_item", () -> new BlockItem(
+            MSBlocks.TEST_BLOCK.get(),
+            new Item.Properties()
+    ));
+
+
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(SWISS.MODID, () -> CreativeModeTab.builder()
             .icon(() -> new ItemStack(STORAGE_ITEM_INTERFACE_ITEM.get(), 1))
             .title(Component.translatable("itemGroup." + SWISS.MODID))
@@ -37,6 +44,8 @@ public final class MSItems {
                 o.accept(STORAGE_ITEM_INTERFACE_ITEM.get());
                 o.accept(EXPORTER_ITEM_INTERFACE_ITEM.get());
                 o.accept(STORAGE_ITEM_PANEL_ITEM.get());
+                o.accept(TEST_BLOCK_ITEM.get());
+
             })
             .build()
     );

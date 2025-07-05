@@ -16,16 +16,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
-import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
+import org.mangorage.swiss.screen.test.TestMenu;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
 import java.util.function.BiFunction;
 
-public final class StoragePanelBlock extends Block implements EntityBlock {
+public final class TestBlock extends Block implements EntityBlock {
     private final BiFunction<BlockPos, BlockState, BlockEntity> function;
 
-    public StoragePanelBlock(Properties p_49795_, BiFunction<BlockPos, BlockState, BlockEntity> function) {
+    public TestBlock(Properties p_49795_, BiFunction<BlockPos, BlockState, BlockEntity> function) {
         super(p_49795_);
         this.function = function;
     }
@@ -41,12 +41,12 @@ public final class StoragePanelBlock extends Block implements EntityBlock {
 
         if (!level.isClientSide()) {
 
-            StorageItemPanelBlockEntity storageItemPanelBlockEntity = (StorageItemPanelBlockEntity) level.getBlockEntity(blockPos);
+            TestBlockEntity storageItemPanelBlockEntity = (TestBlockEntity) level.getBlockEntity(blockPos);
             //MENU OPEN//
-            if (storageItemPanelBlockEntity instanceof StorageItemPanelBlockEntity) {
+            if (storageItemPanelBlockEntity instanceof TestBlockEntity) {
                 ContainerData data = storageItemPanelBlockEntity.data;
                 player.openMenu(new SimpleMenuProvider(
-                        (windowId, playerInventory, playerEntity) -> new StoragePanelMenu(windowId, playerInventory, blockPos, data),
+                        (windowId, playerInventory, playerEntity) -> new TestMenu(windowId, playerInventory, blockPos, data),
                         Component.literal("TEST")), (buf -> buf.writeBlockPos(blockPos)));
             }
             return InteractionResult.SUCCESS;
@@ -66,5 +66,7 @@ public final class StoragePanelBlock extends Block implements EntityBlock {
             }
         };
     }
+
+
 
 }

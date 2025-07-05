@@ -9,6 +9,7 @@ import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
 public final class MSBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, SWISS.MODID);
@@ -27,6 +28,12 @@ public final class MSBlockEntities {
             StorageItemPanelBlockEntity::new,
             MSBlocks.STORAGE_ITEM_PANEL_BLOCK.get()
     ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TestBlockEntity>> TEST_BLOCK_ENTITY = BLOCK_ENTITIES.register("test_block_entity", () -> BlockEntityType.Builder.of(
+            TestBlockEntity::new,
+            MSBlocks.TEST_BLOCK.get()
+    ).build(null));
+
 
 
 

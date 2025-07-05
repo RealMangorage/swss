@@ -12,12 +12,13 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import org.mangorage.swiss.screen.test.TestScreen;
 import org.mangorage.swiss.storage.StorageNetworkManager;
 import org.mangorage.swiss.network.Packets;
 import org.mangorage.swiss.registry.MSBlockEntities;
 import org.mangorage.swiss.registry.MSBlocks;
 import org.mangorage.swiss.registry.MSItems;
-import org.mangorage.swiss.screen.StoragePanelScreen;
+import org.mangorage.swiss.screen.storagepanel.StoragePanelScreen;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.slf4j.Logger;
 
@@ -59,6 +60,7 @@ public final class SWISS {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(MSMenuTypes.STORAGE_MENU.get(), StoragePanelScreen::new);
+            event.register(MSMenuTypes.TEST_MENU.get(), TestScreen::new);
         }
 
     }

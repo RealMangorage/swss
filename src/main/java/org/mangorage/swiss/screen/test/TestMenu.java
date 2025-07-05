@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen;
+package org.mangorage.swiss.screen.test;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -8,38 +8,46 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
 import java.util.List;
 
-public final class StoragePanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
+public final class TestMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
 
-    private StorageItemPanelBlockEntity blockEntity;
+    private TestBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
     private Level level;
     private ContainerData data;
     private Player player;
     private BlockPos blockPos;
 
-    public StoragePanelMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
+    public TestMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
 
     }
 
-    public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
-        super(MSMenuTypes.STORAGE_MENU.get(), containerID);
+    public TestMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+        super(MSMenuTypes.TEST_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
-        this.blockEntity = (StorageItemPanelBlockEntity) this.level.getBlockEntity(blockPos);
+        this.blockEntity = (TestBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
+
+        for (int slots = 0; slots < 9; slots++) {
+            this.addSlot(new SlotItemHandler(blockEntity.getItemStackHandler(), slots, 8 + slots * 18, 20));
+        }
+
 
         addDataSlots(data);
     }
@@ -108,7 +116,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     @Override
     public boolean stillValid(@NotNull Player player) {
         return stillValid(ContainerLevelAccess.create(player.level(), blockPos),
-                player, MSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
+                player, MSBlocks.TEST_BLOCK.get());
     }
 
 

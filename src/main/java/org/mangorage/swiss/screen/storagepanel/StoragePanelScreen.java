@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen;
+package org.mangorage.swiss.screen.storagepanel;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
