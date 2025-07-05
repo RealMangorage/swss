@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -29,9 +30,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private int scrollIndex = 0; // starting item index
     private static final int ITEMS_PER_PAGE = 24;
     private static final int SCROLLBAR_WIDTH = 12;
-    private static final int SCROLLBAR_HEIGHT = 54; // 3 rows * 18px each
+    private static final int SCROLLBAR_HEIGHT = 52; // 3 rows * 18px each
     private static final int SCROLLBAR_X_OFFSET = 154; // adjust to fit GUI width
-    private static final int SCROLLBAR_Y_OFFSET = 16;
+    private static final int SCROLLBAR_Y_OFFSET = 18;
     private boolean isDraggingScrollbar = false;
     private int dragOffsetY = 0;
 
@@ -59,7 +60,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     @Override
     protected void init() {
         super.init();
-        searchBox = new EditBox(font, leftPos + 3 , topPos + 3, 120, 14, Component.literal("Search"));
+        searchBox = new EditBox(font, leftPos + 7 , topPos + 3, 120, 14, Component.literal("Search"));
         searchBox.setResponder(this::onSearchChanged);
         addRenderableWidget(searchBox);
     }
@@ -86,7 +87,8 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         if (maxScroll > 0) {
             float scrollPercent = scrollIndex / (float) maxScroll;
             int handleY = scrollbarY + (int) ((SCROLLBAR_HEIGHT - handleHeight) * scrollPercent);
-            guiGraphics.blit(TEXTURE, scrollbarX, handleY, 176, 0, 12, 15);  // handle
+            guiGraphics.blit(TEXTURE, leftPos + 153,topPos + 17, 188, 0, 14, 54);  // fixed scrollbar background
+            guiGraphics.blit(TEXTURE, scrollbarX, handleY, 176, 0, 12, 15);  // dynamic scrollbar handle
         }
     }
 
@@ -121,6 +123,8 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             int y = startY + row * 18;
 
             ItemStack finalTotalItemStack = new ItemStack(item, count);
+
+            guiGraphics.blit(TEXTURE, x - 1, y - 1, 202, 0, 18, 18); // background for item slot
 
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
                 guiGraphics.renderTooltip(font, finalTotalItemStack, mouseX, mouseY);

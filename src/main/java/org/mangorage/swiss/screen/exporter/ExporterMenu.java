@@ -32,7 +32,7 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     }
 
     public ExporterMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
-        super(MSMenuTypes.IMPORTER_MENU.get(), containerID);
+        super(MSMenuTypes.EXPORTER_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
