@@ -7,14 +7,14 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.mangostorage.MangoStorage;
 
-public class MSMenuTypes {
+public final class MSMenuTypes {
 
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(BuiltInRegistries.MENU, MangoStorage.MODID);
 
-    public static final DeferredHolder<MenuType<?>, MenuType<InterfaceMenu>> INTERFACE_MENU;
+    public static final DeferredHolder<MenuType<?>, MenuType<StoragePanelMenu>> STORAGE_MENU;
 
     static {
-        INTERFACE_MENU = MENUS.register("interface_menu", () -> IMenuTypeExtension.create(InterfaceMenu::new));
+        STORAGE_MENU = MENUS.register("storage_menu", () -> IMenuTypeExtension.create(StoragePanelMenu::new));
     }
 }

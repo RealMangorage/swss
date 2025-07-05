@@ -6,8 +6,9 @@ import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.mangorage.mangostorage.MangoStorage;
+import org.mangorage.mangostorage.registry.MSBlocks;
 
-public class MSLangProvider extends LanguageProvider {
+public final class MSLangProvider extends LanguageProvider {
 
     public MSLangProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, MangoStorage.MODID, "en_us");
@@ -20,10 +21,9 @@ public class MSLangProvider extends LanguageProvider {
         add("itemGroup." + MangoStorage.MODID, "Mango Storage");
 
         //Blocks
-        addBlockTranslation("exporter", "Exporter");
-        addBlockTranslation("interface", "Interface");
-
-
+        addBlock(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
+        addBlock(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
+        addBlock(MSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
     }
 
 

@@ -1,10 +1,11 @@
 package org.mangorage.mangostorage.world.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -13,16 +14,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mangorage.mangostorage.storage.util.IRightClickable;
+import org.mangorage.mangostorage.screen.StoragePanelMenu;
+import org.mangorage.mangostorage.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 import org.mangorage.mangostorage.world.block.entity.TickingBlockEntity;
 
 import java.util.function.BiFunction;
 
-public final class StorageBlock extends Block implements EntityBlock {
+public final class StoragePanelBlock extends Block implements EntityBlock {
     private final BiFunction<BlockPos, BlockState, BlockEntity> function;
 
-    public StorageBlock(Properties p_49795_, BiFunction<BlockPos, BlockState, BlockEntity> function) {
+    public StoragePanelBlock(Properties p_49795_, BiFunction<BlockPos, BlockState, BlockEntity> function) {
         super(p_49795_);
         this.function = function;
     }
@@ -34,16 +37,21 @@ public final class StorageBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState p_316362_, Level level, BlockPos blockPos, Player player, InteractionHand p_316595_, BlockHitResult p_316140_) {
-        if (level.isClientSide()) return ItemInteractionResult.CONSUME;
-        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
 
-        if (blockEntity != null && blockEntity instanceof IRightClickable rightClickable) {
-            rightClickable.onPlayerClick(stack, player);
-            return ItemInteractionResult.SUCCESS;
-        } else {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (!level.isClientSide()) {
+
+            StorageItemPanelBlockEntity storageItemPanelBlockEntity = (StorageItemPanelBlockEntity) level.getBlockEntity(blockPos);
+            //MENU OPEN//
+            if (storageItemPanelBlockEntity instanceof StorageItemPanelBlockEntity) {
+                ContainerData data = storageItemPanelBlockEntity.data;
+                player.openMenu(new SimpleMenuProvider(
+                        (windowId, playerInventory, playerEntity) -> new StoragePanelMenu(windowId, playerInventory, blockPos, data),
+                        Component.literal("TEST")), (buf -> buf.writeBlockPos(blockPos)));
+            }
+            return InteractionResult.SUCCESS;
         }
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -58,4 +66,5 @@ public final class StorageBlock extends Block implements EntityBlock {
             }
         };
     }
+
 }

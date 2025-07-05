@@ -4,8 +4,9 @@ import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.mangorage.mangostorage.MangoStorage;
+import org.mangorage.mangostorage.registry.MSBlocks;
 
-public class MSItemModelProvider extends ItemModelProvider {
+public final class MSItemModelProvider extends ItemModelProvider {
 
     public MSItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, MangoStorage.MODID, existingFileHelper);
@@ -18,6 +19,5 @@ public class MSItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
 
         //Add item models
-
     }
 }

@@ -18,8 +18,8 @@ public class MSLootTableProvider extends VanillaBlockLoot {
     @Override
     protected void generate() {
 
-        this.dropSelf(MSBlocks.EXPORTER_BLOCK.get());
-        this.dropSelf(MSBlocks.INTERFACE_BLOCK.get());
+        this.dropSelf(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
+        this.dropSelf(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get());
 
     }
 

@@ -12,7 +12,7 @@ import org.mangorage.mangostorage.MangoStorage;
 
 import java.util.concurrent.CompletableFuture;
 
-public class MSItemTags extends ItemTagsProvider {
+public final class MSItemTags extends ItemTagsProvider {
 
     MSItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTags, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, blockTags.contentsGetter(), MangoStorage.MODID, existingFileHelper);
@@ -22,6 +22,5 @@ public class MSItemTags extends ItemTagsProvider {
     protected void addTags(HolderLookup.@NotNull Provider provider) {
 
         //Item Tags
-
     }
 }

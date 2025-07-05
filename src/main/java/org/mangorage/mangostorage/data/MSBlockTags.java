@@ -9,7 +9,7 @@ import org.mangorage.mangostorage.MangoStorage;
 
 import java.util.concurrent.CompletableFuture;
 
-public class MSBlockTags extends BlockTagsProvider {
+public final class MSBlockTags extends BlockTagsProvider {
 
     MSBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, MangoStorage.MODID, existingFileHelper);

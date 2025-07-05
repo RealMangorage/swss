@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @EventBusSubscriber(modid = MangoStorage.MODID)
-public class DataGenerators {
+public final class DataGenerators {
 
 
     @SubscribeEvent

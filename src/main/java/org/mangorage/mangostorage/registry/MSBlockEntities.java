@@ -6,26 +6,26 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.mangostorage.MangoStorage;
-import org.mangorage.mangostorage.world.block.entity.ExporterBlockEntity;
-import org.mangorage.mangostorage.world.block.entity.InterfaceBlockEntity;
-import org.mangorage.mangostorage.world.block.entity.TestInterfaceBlockEntity;
+import org.mangorage.mangostorage.world.block.entity.item.interfaces.ItemExporterBlockEntity;
+import org.mangorage.mangostorage.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
+import org.mangorage.mangostorage.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 public final class MSBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MangoStorage.MODID);
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InterfaceBlockEntity>> INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("interface", () -> BlockEntityType.Builder.of(
-            InterfaceBlockEntity::new,
-            MSBlocks.INTERFACE_BLOCK.get()
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemInterfaceBlockEntity>> STORAGE_ITEM_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("storage_item_interface_block_entity", () -> BlockEntityType.Builder.of(
+            ItemInterfaceBlockEntity::new,
+            MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()
     ).build(null));
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ExporterBlockEntity>> EXPORTER_BLOCK_ENTITY = BLOCK_ENTITIES.register("exporter", () -> BlockEntityType.Builder.of(
-            ExporterBlockEntity::new,
-            MSBlocks.EXPORTER_BLOCK.get()
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemExporterBlockEntity>> EXPORTER_ITEM_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("exporter_item_interface_block_entity", () -> BlockEntityType.Builder.of(
+            ItemExporterBlockEntity::new,
+            MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()
     ).build(null));
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TestInterfaceBlockEntity>> TEST_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("test_interface", () -> BlockEntityType.Builder.of(
-            TestInterfaceBlockEntity::new,
-            MSBlocks.TEST_INTERFACE_BLOCK.get()
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StorageItemPanelBlockEntity>> STORAGE_ITEM_PANEL_BLOCK_ENTITY = BLOCK_ENTITIES.register("storage_item_panel_block_entity", () -> BlockEntityType.Builder.of(
+            StorageItemPanelBlockEntity::new,
+            MSBlocks.STORAGE_ITEM_PANEL_BLOCK.get()
     ).build(null));
 
 

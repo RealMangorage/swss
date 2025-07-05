@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "mangostorage:block/storage_item_interface"
+    }
+  }
+}
