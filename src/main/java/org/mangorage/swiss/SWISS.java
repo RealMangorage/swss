@@ -12,6 +12,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import org.mangorage.swiss.screen.exporter.ExporterScreen;
+import org.mangorage.swiss.screen.setting.SettingsScreen;
 import org.mangorage.swiss.screen.test.TestScreen;
 import org.mangorage.swiss.storage.StorageNetworkManager;
 import org.mangorage.swiss.network.Packets;
@@ -61,6 +63,8 @@ public final class SWISS {
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(MSMenuTypes.STORAGE_MENU.get(), StoragePanelScreen::new);
             event.register(MSMenuTypes.TEST_MENU.get(), TestScreen::new);
+            event.register(MSMenuTypes.SETTINGS_MENU.get(), SettingsScreen::new);
+            event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
         }
 
     }

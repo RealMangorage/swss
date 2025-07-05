@@ -10,6 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.world.block.entity.item.SettingsItems;
 
 public final class MSItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(SWISS.MODID);
@@ -35,6 +36,10 @@ public final class MSItems {
             new Item.Properties()
     ));
 
+    public static final DeferredHolder<Item, Item> SETTINGS = ITEMS.register("settings", () -> new SettingsItems(
+            new Item.Properties()
+    ));
+
 
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(SWISS.MODID, () -> CreativeModeTab.builder()
@@ -45,6 +50,7 @@ public final class MSItems {
                 o.accept(EXPORTER_ITEM_INTERFACE_ITEM.get());
                 o.accept(STORAGE_ITEM_PANEL_ITEM.get());
                 o.accept(TEST_BLOCK_ITEM.get());
+                o.accept(SETTINGS.get());
 
             })
             .build()

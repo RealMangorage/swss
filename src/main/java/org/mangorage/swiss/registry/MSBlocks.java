@@ -20,6 +20,7 @@ public final class MSBlocks {
     public static final DeferredHolder<Block, StorageBlock> STORAGE_ITEM_INTERFACE_BLOCK = BLOCKS.register("storage_item_interface", () -> new StorageBlock(
             BlockBehaviour.Properties.of(), ItemInterfaceBlockEntity::new
     ));
+
     public static final DeferredHolder<Block, StorageBlock> EXPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("exporter_item_interface", () -> new StorageBlock(
             BlockBehaviour.Properties.of(), ItemExporterBlockEntity::new
     ));
