@@ -2,9 +2,10 @@ package org.mangorage.swiss.storage.device;
 
 import net.neoforged.neoforge.items.IItemHandler;
 
-public interface ItemDevice extends IDevice {
+/**
+ * Anything that wants to link items to a network or
+ * put items into a network
+ */
+public interface ItemDevice extends IDeviceWithHandler {
     IItemHandler getItemHandler();
-
-    boolean canInsert();
-    boolean canExtract();
 }

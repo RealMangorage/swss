@@ -1,6 +1,7 @@
 package org.mangorage.swiss.screen.storagepanel;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.network.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
@@ -30,7 +32,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private int scrollIndex = 0;
 
     private static final int COLUMNS = 9;
-    public static int visibleRows;
+    public static int visibleRows = 12;
     private int itemsPerPage = visibleRows * COLUMNS;
 
     private static final int SCROLLBAR_WIDTH = 12;
@@ -49,7 +51,6 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
     public StoragePanelScreen(StoragePanelMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
-        visibleRows = 12; // min 3
         this.itemsPerPage = visibleRows * COLUMNS;
         this.allItems = getAllItems();
         this.filteredItems = new ArrayList<>(allItems);
@@ -209,6 +210,13 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    protected void containerTick() {
+        if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.connection.send(RequestNetworkItemsPacketC2S.INSTANCE);
+        }
     }
 
     @Override

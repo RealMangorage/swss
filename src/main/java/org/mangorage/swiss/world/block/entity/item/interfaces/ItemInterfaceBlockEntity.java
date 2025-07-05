@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.MSBlockEntities;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
@@ -37,12 +38,12 @@ public final class ItemInterfaceBlockEntity extends BaseStorageBlockEntity imple
     }
 
     @Override
-    public boolean canInsert() {
+    public boolean canInsert(DeviceType type) {
         return false;
     }
 
     @Override
-    public boolean canExtract() {
+    public boolean canExtract(DeviceType type) {
         return true;
     }
 }

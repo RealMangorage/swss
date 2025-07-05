@@ -10,7 +10,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.mangorage.swiss.storage.network.INetwork;
+import org.mangorage.swiss.storage.network.Network;
+import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.util.IRightClickable;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.MSBlockEntities;
@@ -38,11 +39,11 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
 
             if (output != null) {
 
-                INetwork network = getNetwork();
+                Network network = getNetwork();
                 ItemHandlerLookup lookup = new ItemHandlerLookup(
                         network
                                 .getItemDevices()
-                                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract())
+                                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
                                 .map(ItemDevice::getItemHandler)
                                 .filter(Objects::nonNull)
                                 .toList()

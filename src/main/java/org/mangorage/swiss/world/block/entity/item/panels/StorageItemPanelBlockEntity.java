@@ -8,6 +8,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.mangorage.swiss.storage.device.DeviceType;
+import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.MSBlockEntities;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
@@ -52,29 +54,10 @@ public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity im
         }
     }
 
-    @Override
-    public IItemHandler getItemHandler() {
-        BlockPos above = getBlockPos().above();
-        BlockState aboveState = level.getBlockState(above);
-        BlockEntity aboveEntity = level.getBlockEntity(above);
-        return Capabilities.ItemHandler.BLOCK.getCapability(level, above, aboveState, aboveEntity, Direction.DOWN);
-    }
-
-    @Override
-    public boolean canInsert() {
-        return false;
-    }
-
-    @Override
-    public boolean canExtract() {
-        return false;
-    }
-
     public List<ItemStack> getItems() {
-
-        final var items = getNetwork()
+        return getNetwork()
                 .getItemDevices()
-                .filter(device -> device.isValidDevice() && device.canExtract())
+                .filter(device -> device.isValidDevice() && device.canExtract(DeviceType.ITEM))
                 .map(ItemDevice::getItemHandler)
                 .filter(Objects::nonNull)
                 .map(handler -> {
@@ -89,7 +72,20 @@ public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity im
                 .flatMap(List::stream)
                 .filter(item -> !item.isEmpty())
                 .toList();
+    }
 
-        return items;
+    @Override
+    public IItemHandler getItemHandler() {
+        return null;
+    }
+
+    @Override
+    public boolean canInsert(DeviceType type) {
+        return false;
+    }
+
+    @Override
+    public boolean canExtract(DeviceType type) {
+        return false;
     }
 }

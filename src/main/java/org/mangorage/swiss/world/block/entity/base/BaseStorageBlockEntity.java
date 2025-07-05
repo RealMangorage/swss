@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
-import org.mangorage.swiss.storage.network.INetwork;
-import org.mangorage.swiss.storage.StorageNetworkManager;
+import org.mangorage.swiss.StorageNetworkManager;
+
+import java.util.UUID;
 
 public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice {
 
@@ -17,31 +19,23 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         super(type, pos, blockState);
     }
 
-
     protected void connectToNetwork() {
         if (loaded) return;
         loaded = true;
-        StorageNetworkManager.getInstance().ifPresent(manager -> {
-            manager.getOrCreateNetwork(level.getServer(), getNetworkId())
-                    .registerDevice(this);
-        });
+        getNetwork().registerDevice(this);
     }
 
-    protected INetwork getNetwork() {
-        return StorageNetworkManager.getInstance().get().getOrCreateNetwork(level.getServer(), getNetworkId());
+    public Network getNetwork() {
+        return StorageNetworkManager.getInstance().getOrCreateNetwork(level.getServer(), UUID.randomUUID(), getNetworkId());
     }
 
     @Override
     public void setNetworkId(int id) {
-        StorageNetworkManager.getInstance().ifPresent(manager -> {
-            manager.getOrCreateNetwork(level.getServer(), getNetworkId())
-                    .unregisterDevice(this);
-        });
+        getNetwork()
+                .unregisterDevice(this);
         networkId = id;
-        StorageNetworkManager.getInstance().ifPresent(manager -> {
-            manager.getOrCreateNetwork(level.getServer(), getNetworkId())
-                    .registerDevice(this);
-        });
+        getNetwork()
+                .registerDevice(this);
     }
 
     @Override

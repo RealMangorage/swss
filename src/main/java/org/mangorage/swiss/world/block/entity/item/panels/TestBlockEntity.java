@@ -18,6 +18,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mangorage.swiss.registry.MSBlockEntities;
+import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
@@ -78,13 +79,12 @@ public final class TestBlockEntity extends BaseStorageBlockEntity implements Tic
         return itemHandler;
     }
 
-    @Override
-    public boolean canInsert() {
+    public boolean canInsert(DeviceType type) {
         return false;
     }
 
     @Override
-    public boolean canExtract() {
+    public boolean canExtract(DeviceType type) {
         return false;
     }
 
@@ -92,7 +92,7 @@ public final class TestBlockEntity extends BaseStorageBlockEntity implements Tic
 
         final var items = getNetwork()
                 .getItemDevices()
-                .filter(device -> device.isValidDevice() && device.canExtract())
+                .filter(device -> device.isValidDevice() && device.canExtract(DeviceType.ITEM))
                 .map(ItemDevice::getItemHandler)
                 .filter(Objects::nonNull)
                 .map(handler -> {
