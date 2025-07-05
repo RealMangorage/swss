@@ -52,7 +52,7 @@ public class InterfaceScreen extends AbstractContainerScreen<InterfaceMenu> {
 
     public List<ItemStack> getAllItems() {
         return new ArrayList<>(BuiltInRegistries.ITEM.stream()
-                .map(Item::getDefaultInstance)
+                .map(i -> new ItemStack(i, 2))
                 .toList());
     }
 
@@ -114,6 +114,7 @@ public class InterfaceScreen extends AbstractContainerScreen<InterfaceMenu> {
                 guiGraphics.renderTooltip(font, item.getDefaultInstance(), mouseX, mouseY);
             }
             guiGraphics.renderItem(item.getDefaultInstance(), x, y);
+            guiGraphics.renderItemDecorations(font, item.getDefaultInstance(), x, y, "1k");
         }
 
         renderTooltip(guiGraphics, mouseX, mouseY);
