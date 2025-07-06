@@ -15,7 +15,7 @@ import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.storage.util.IPacketRequest;
-import org.mangorage.swiss.util.ItemHandlerLookup;
+import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.List;
@@ -151,15 +151,23 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     @Override
     public void clicked(ClickType clickType, ItemStack itemStack) {
         if (clickType == ClickType.PICKUP) {
-            if (getCarried().isEmpty()) {
+            if (getCarried().isEmpty() && itemStack != null) {
 
                 final var lookup = ItemHandlerLookup.getLookupForExtract(blockEntity.getNetwork());
+                final var result = lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()));
+                if (!result.isEmpty()) {
+                    setCarried(result);
+                }
 
-                lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()))
-                        .ifPresent(result -> {
-                            setCarried(result.stack());
-                        });
-
+            } else if (!getCarried().isEmpty()) {
+                final var stack = getCarried();
+                final var lookup = ItemHandlerLookup.getLookupForInsert(blockEntity.getNetwork());
+                final var remainder = lookup.insertIntoHandlers(stack);
+                if (remainder.isEmpty()) {
+                    setCarried(ItemStack.EMPTY);
+                } else {
+                    setCarried(remainder);
+                }
             }
         }
     }

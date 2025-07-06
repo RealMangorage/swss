@@ -39,7 +39,7 @@ public final class ItemInterfaceBlockEntity extends BaseStorageBlockEntity imple
 
     @Override
     public boolean canInsert(DeviceType type) {
-        return false;
+        return true;
     }
 
     @Override

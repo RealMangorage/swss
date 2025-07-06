@@ -22,7 +22,7 @@ public record MenuInteractPacketC2S(ItemStack itemStack, int clickType) implemen
     };
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MenuInteractPacketC2S> STREAM_CODEC = StreamCodec.composite(
-            ItemStack.STREAM_CODEC, MenuInteractPacketC2S::itemStack,
+            ItemStack.OPTIONAL_STREAM_CODEC, MenuInteractPacketC2S::itemStack,
             ByteBufCodecs.INT, MenuInteractPacketC2S::clickType,
             MenuInteractPacketC2S::new
     );

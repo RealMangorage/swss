@@ -53,7 +53,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private boolean isDraggingScrollbar = false;
     private int dragOffsetY = 0;
 
-    private ItemStack selected = null;
+    private ItemStack selected = ItemStack.EMPTY;
 
 
     private static final ResourceLocation TEXTURE =
@@ -194,12 +194,14 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             ItemStack finalTotalItemStack = new ItemStack(item, count);
             finalTotalItemStack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(finalTotalItemStack.getCount()));
 
+            // TODO: Ben only set selected if its within the window of the storage items
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
                 guiGraphics.renderTooltip(font, finalTotalItemStack, mouseX, mouseY);
                 selected = finalTotalItemStack;
             } else {
-                selected = null;
+                selected = ItemStack.EMPTY;
             }
+
             guiGraphics.renderItem(finalTotalItemStack, x, y);
             renderAmount(guiGraphics, x, y, NumbersUtil.format(finalTotalItemStack.getCount()), 0xFFFFFF);
         }
@@ -244,9 +246,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             }
         }
 
-        if (selected != null) {
-            Minecraft.getInstance().player.connection.send(new MenuInteractPacketC2S(selected, ClickType.PICKUP.ordinal()));
-        }
+        // TODO: Ben only send if we are clicking in the window of the storage rows...
+        Minecraft.getInstance().player.connection.send(new MenuInteractPacketC2S(selected, ClickType.PICKUP.ordinal()));
+
 
         return super.mouseClicked(mouseX, mouseY, button);
     }

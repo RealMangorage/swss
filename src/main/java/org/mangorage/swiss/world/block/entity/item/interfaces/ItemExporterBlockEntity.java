@@ -12,9 +12,11 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.mangorage.swiss.storage.util.IRightClickable;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
-import org.mangorage.swiss.util.ItemHandlerLookup;
+import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
+
+import java.util.List;
 
 public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable {
     private int ticks = 0;
@@ -32,15 +34,19 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
 
             IItemHandler output = getOutput();
 
-            if (output != null) {
+            if (output != null && ItemHandlerLookup.hasRoom(output, exportItem.getDefaultInstance())) {
 
-                ItemHandlerLookup lookup = ItemHandlerLookup.getLookupForExtract(getNetwork());
+                final var lookup = ItemHandlerLookup.getLookupForExtract(getNetwork());
+                final var result = lookup.findAny(exportItem, 8);
 
-                lookup.findAny(exportItem, 32).ifPresent(result -> {
-                    result.insert(output);
-                });
-
+                if (!result.isEmpty()) {
+                    final var remainder = ItemHandlerLookup.insertIntoHandlers(List.of(output), result);
+                    if (!remainder.isEmpty()) {
+                        lookup.insertIntoHandlers(remainder);
+                    }
+                }
             }
+
         }
     }
 
