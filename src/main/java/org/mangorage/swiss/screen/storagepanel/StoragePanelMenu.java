@@ -83,6 +83,8 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         return super.clickMenuButton(player, id);
     }
 
+
+    //Todo : make shift clicking out of the network work
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
         Slot sourceSlot = slots.get(index);
