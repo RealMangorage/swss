@@ -4,19 +4,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -28,9 +24,6 @@ import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.util.NumbersUtil;
 import org.mangorage.swiss.world.ItemCount;
-
-import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -241,13 +234,6 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
         int startX = leftPos + 8;
         int startY = topPos + 20; // Adjusted to fit the GUI layoute
-
-        Map<Item, Integer> itemTotalCounts = new LinkedHashMap<>();
-        for (ItemStack stack : filteredItems) {
-            itemTotalCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
-        }
-
-        List<Map.Entry<Item, Integer>> itemList = new ArrayList<>(itemTotalCounts.entrySet());
 
         for (int i = 0; i < itemsPerPage; i++) {
             int index = scrollIndex + i;
