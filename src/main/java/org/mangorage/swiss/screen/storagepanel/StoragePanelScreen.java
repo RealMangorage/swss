@@ -44,7 +44,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private int scrollIndex = 0;
 
     private static final int COLUMNS = 9;
-    public static int visibleRows = 12;
+    public static int visibleRows = 3;
     private int itemsPerPage = visibleRows * COLUMNS;
 
     private static final int SCROLLBAR_WIDTH = 12;
@@ -52,7 +52,8 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private static final int SCROLLBAR_Y_OFFSET = 18;
     private boolean isDraggingScrollbar = false;
     private int dragOffsetY = 0;
-
+    private int lastAllItemsSize = -1;
+    private String lastSearchText = "";
     private ItemStack selected = ItemStack.EMPTY;
 
 
@@ -67,35 +68,105 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         super(menu, inventory, component);
         this.itemsPerPage = visibleRows * COLUMNS;
         this.allItems = getAllItems();
+        System.out.println("Constructor allItems size: " + this.allItems.size());  // Debug
         this.filteredItems = new ArrayList<>(allItems);
         this.imageHeight = 175 + (visibleRows - 3) * 18;
         this.imageWidth = 192;
         this.inventoryLabelY = this.imageHeight - 98;
+        this.lastSearchText = "";
     }
+
 
     @Override
     public void update() {
-        this.allItems = getAllItems();
-        this.filteredItems = new ArrayList<>(allItems);
+        List<ItemStack> newAllItems = getAllItems();
+        if (newAllItems.size() != lastAllItemsSize) {
+            this.allItems = newAllItems;
+            onSearchChanged(searchBox != null ? searchBox.getValue() : "");
+            lastAllItemsSize = newAllItems.size();
+        } else {
+            String currentSearch = searchBox != null ? searchBox.getValue() : "";
+            if (!currentSearch.equals(lastSearchText)) {
+                onSearchChanged(currentSearch);
+            }
+        }
     }
 
     public List<ItemStack> getAllItems() {
         return menu.itemStacks;
     }
 
+    private int calculateMaxRows() {
+        int windowHeight = this.minecraft.getWindow().getGuiScaledHeight();
+
+        int topSectionHeight = 72;
+        int bottomSectionHeight = 101;
+        int searchBoxHeight = 20;
+        int margin = 10;
+
+        int availableHeight = windowHeight - topSectionHeight - bottomSectionHeight - searchBoxHeight - margin * 2;
+
+        int maxRows = availableHeight / 18;
+        return Math.max(3, maxRows);
+    }
+
+    private void cycleVisibleRows() {
+        int maxRows = calculateMaxRows();
+
+        visibleRows++;
+        if (visibleRows > maxRows) {
+            visibleRows = 3;
+        }
+        itemsPerPage = visibleRows * COLUMNS;
+
+        this.imageHeight = 175 + (visibleRows - 3) * 18;
+        this.inventoryLabelY = this.imageHeight - 98;
+
+        assert this.minecraft != null;
+        this.topPos = (this.minecraft.getWindow().getGuiScaledHeight() - this.imageHeight) / 2;
+
+        scrollIndex = 0;
+        this.init();
+    }
+
     @Override
     protected void init() {
         super.init();
+
+        this.clearWidgets();
+        this.menu.slots.clear();
+
         searchBox = new EditBox(font, leftPos + 69 , topPos + 3, 100, 14, Component.literal("Search"));
         searchBox.setResponder(this::onSearchChanged);
         addRenderableWidget(searchBox);
+
+        assert this.minecraft != null;
+        assert this.minecraft.player != null;
+        this.menu.addPlayerInventory(this.minecraft.player.getInventory());
+        this.menu.addPlayerHotbar(this.minecraft.player.getInventory());
+
+        onSearchChanged(searchBox.getValue());
+        lastSearchText = searchBox.getValue();
     }
 
+
     private void onSearchChanged(String text) {
-        filteredItems = allItems.stream()
-                .filter(item -> item.getItem().getDescription().getString().toLowerCase().contains(text.toLowerCase()))
+        lastSearchText = text;
+        Map<Item, Integer> itemCounts = new LinkedHashMap<>();
+        for (ItemStack stack : allItems) {
+            itemCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+        }
+
+        filteredItems = itemCounts.entrySet().stream()
+                .filter(entry -> entry.getKey().getDescription().getString().toLowerCase().contains(text.toLowerCase()))
+                .map(entry -> {
+                    ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
+                    stack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(entry.getValue()));
+                    return stack;
+                })
                 .toList();
-        scrollIndex = 0; // Reset scroll
+
+        scrollIndex = 0;
     }
 
     @Override
@@ -180,30 +251,24 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
         for (int i = 0; i < itemsPerPage; i++) {
             int index = scrollIndex + i;
-            if (index >= itemList.size()) break;
+            if (index >= filteredItems.size()) break;
 
-            Map.Entry<Item, Integer> entry = itemList.get(index);
-            Item item = entry.getKey();
-            int count = entry.getValue();
+            ItemStack stack = filteredItems.get(index);
 
             int row = i / COLUMNS;
             int col = i % COLUMNS;
             int x = startX + col * 18;
             int y = startY + row * 18;
 
-            ItemStack finalTotalItemStack = new ItemStack(item, count);
-            finalTotalItemStack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(finalTotalItemStack.getCount()));
-
-            // TODO: Ben only set selected if its within the window of the storage items
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
-                guiGraphics.renderTooltip(font, finalTotalItemStack, mouseX, mouseY);
-                selected = finalTotalItemStack;
+                guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
+                selected = stack;
             } else {
                 selected = ItemStack.EMPTY;
             }
 
-            guiGraphics.renderItem(finalTotalItemStack, x, y);
-            renderAmount(guiGraphics, x, y, NumbersUtil.format(finalTotalItemStack.getCount()), 0xFFFFFF);
+            guiGraphics.renderItem(stack, x, y);
+            renderAmount(guiGraphics, x, y, NumbersUtil.format(stack.getCount()), 0xFFFFFF);
         }
 
         renderTooltip(guiGraphics, mouseX, mouseY);
@@ -228,10 +293,52 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int startX = leftPos + 8;
+        int startY = topPos + 20;
+        int slotSize = 18;
+
+        if (button == 1 && searchBox != null) {
+            if (searchBox.isMouseOver(mouseX, mouseY)) {
+                searchBox.setValue("");
+                onSearchChanged("");
+                return true;
+            }
+        }
+
+        if (button == 0 && searchBox != null && !searchBox.isMouseOver(mouseX, mouseY)) {
+            searchBox.setFocused(false);
+        }
+
+        if (button == 1 && (searchBox == null || !searchBox.isMouseOver(mouseX, mouseY))) {
+            cycleVisibleRows();
+            return true;
+        }
+
+        for (int i = 0; i < itemsPerPage; i++) {
+            int index = scrollIndex + i;
+            if (index >= filteredItems.size()) break;
+
+            int row = i / COLUMNS;
+            int col = i % COLUMNS;
+            int x = startX + col * slotSize;
+            int y = startY + row * slotSize;
+
+            if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
+                ItemStack stack = filteredItems.get(index);
+                if (!stack.isEmpty()) {
+                    // Send interaction packet to server
+                    Minecraft.getInstance().player.connection.send(
+                            new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal())
+                    );
+                    return true;
+                }
+            }
+        }
+
+        // Handle scrollbar click
         int scrollbarX = leftPos + SCROLLBAR_X_OFFSET;
         int scrollbarY = topPos + SCROLLBAR_Y_OFFSET;
         int handleHeight = 15;
-
         int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
         if (maxScroll > 0) {
             float scrollPercent = scrollIndex / (float) maxScroll;
@@ -246,12 +353,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             }
         }
 
-        // TODO: Ben only send if we are clicking in the window of the storage rows...
-        Minecraft.getInstance().player.connection.send(new MenuInteractPacketC2S(selected, ClickType.PICKUP.ordinal()));
-
-
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
 
     @Override
     protected void containerTick() {

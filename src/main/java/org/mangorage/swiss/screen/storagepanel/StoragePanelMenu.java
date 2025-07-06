@@ -34,6 +34,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     }
 
+
     public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
         super(MSMenuTypes.STORAGE_MENU.get(), containerID);
         this.player = inventory.player;
@@ -46,6 +47,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         addPlayerHotbar(inventory);
 
         addDataSlots(data);
+
     }
 
     @Override
@@ -76,8 +78,6 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     // THIS YOU HAVE TO DEFINE!
     private static final int TE_INVENTORY_SLOT_COUNT = 3;  // must be the number of slots you have!
 
-
-
     @Override
     public boolean clickMenuButton(Player player, int id) {
         return super.clickMenuButton(player, id);
@@ -86,34 +86,45 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
         Slot sourceSlot = slots.get(index);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
-        ItemStack sourceStack = sourceSlot.getItem();
-        ItemStack copyOfSourceStack = sourceStack.copy();
+        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;
 
-        // Check if the slot clicked is one of the vanilla container slots
-        if (index < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-            // This is a vanilla container slot so merge the stack into the tile inventory
-            if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX
-                    + TE_INVENTORY_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;  // EMPTY_ITEM
+        ItemStack sourceStack = sourceSlot.getItem();
+        ItemStack originalStack = sourceStack.copy();
+
+        if (!playerIn.level().isClientSide()) {
+            // Shift-clicked in player inventory: try to insert into network
+            if (index < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
+                var insertHandler = ItemHandlerLookup.getLookupForInsert(blockEntity.getNetwork());
+                ItemStack leftover = insertHandler.insertIntoHandlers(sourceStack);
+
+                if (leftover.isEmpty()) {
+                    sourceSlot.set(ItemStack.EMPTY);
+                } else {
+                    sourceSlot.set(leftover);
+                }
+                sourceSlot.setChanged();
+                return originalStack;
             }
-        } else if (index < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
-            // This is a TE slot so merge the stack into the players inventory
-            if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;
+            // Shift-clicked in TE (network) slots: try to extract full stack and put into player inventory
+            else if (index >= TE_INVENTORY_FIRST_SLOT_INDEX && index < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
+                // Directly try to move the item stack from the tile entity slot into the player inventory slots
+                if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
+                    // Failed to move to player inventory
+                    return ItemStack.EMPTY;
+                }
+
+                // After moving, if all items were moved, clear the source slot
+                if (sourceStack.isEmpty()) {
+                    sourceSlot.set(ItemStack.EMPTY);
+                } else {
+                    sourceSlot.setChanged();
+                }
+
+                return originalStack;
             }
-        } else {
-            System.out.println("Invalid slotIndex:" + index);
-            return ItemStack.EMPTY;
         }
-        // If stack size == 0 (the entire stack was moved) set slot contents to null
-        if (sourceStack.getCount() == 0) {
-            sourceSlot.set(ItemStack.EMPTY);
-        } else {
-            sourceSlot.setChanged();
-        }
-        sourceSlot.onTake(playerIn, sourceStack);
-        return copyOfSourceStack;
+
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -121,7 +132,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         return stillValid(ContainerLevelAccess.create(player.level(), blockPos), player, SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
     }
 
-    private void addPlayerInventory(Inventory playerInventory) {
+    public void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
                 this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 36 + (StoragePanelScreen.visibleRows * 18) + i * 18));
@@ -129,7 +140,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         }
     }
 
-    private void addPlayerHotbar(Inventory playerInventory) {
+    public void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 94  + (StoragePanelScreen.visibleRows * 18) ));
         }
