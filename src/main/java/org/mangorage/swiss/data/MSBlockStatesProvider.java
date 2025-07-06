@@ -4,7 +4,7 @@ import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.registry.SWISSBlocks;
 
 public final class MSBlockStatesProvider extends BlockStateProvider {
 
@@ -16,11 +16,11 @@ public final class MSBlockStatesProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
 
-        simpleBlockWithItem(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get(), models()
-                .cubeAll(blockTexture(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get())));
+        simpleBlockWithItem(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get(), models()
+                .cubeAll(blockTexture(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get())));
 
-        simpleBlockWithItem(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get(), models()
-                .cubeAll(blockTexture(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())));
+        simpleBlockWithItem(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get(), models()
+                .cubeAll(blockTexture(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())));
     }
 
 

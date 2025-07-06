@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
-import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
@@ -109,7 +109,7 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     @Override
     public boolean stillValid(@NotNull Player player) {
         return stillValid(ContainerLevelAccess.create(player.level(), blockPos),
-                player, MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
+                player, SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
     }
 
 

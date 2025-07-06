@@ -3,8 +3,12 @@ package org.mangorage.swiss.util;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.mangorage.swiss.storage.device.DeviceType;
+import org.mangorage.swiss.storage.device.ItemDevice;
+import org.mangorage.swiss.storage.network.Network;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class ItemHandlerLookup {
@@ -12,6 +16,17 @@ public final class ItemHandlerLookup {
 
     public ItemHandlerLookup(List<IItemHandler> handlers) {
         this.handlers = handlers;
+    }
+
+    public static ItemHandlerLookup getLookupForExtract(Network network) {
+        return new ItemHandlerLookup(
+                network
+                        .getItemDevices()
+                        .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
+                        .map(ItemDevice::getItemHandler)
+                        .filter(Objects::nonNull)
+                        .toList()
+        );
     }
 
     public Optional<LookupResult> findAny(Item item, int amount) {

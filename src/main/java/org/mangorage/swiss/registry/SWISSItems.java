@@ -12,27 +12,27 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.world.block.entity.item.SettingsItems;
 
-public final class MSItems {
+public final class SWISSItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(SWISS.MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, SWISS.MODID);
 
     public static final DeferredHolder<Item, BlockItem> STORAGE_ITEM_INTERFACE_ITEM = ITEMS.register("storage_item_interface", () -> new BlockItem(
-            MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get(),
+            SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get(),
             new Item.Properties()
     ));
 
     public static final DeferredHolder<Item, BlockItem> EXPORTER_ITEM_INTERFACE_ITEM = ITEMS.register("exporter_item_interface", () -> new BlockItem(
-            MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get(),
+            SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get(),
             new Item.Properties()
     ));
 
     public static final DeferredHolder<Item, Item> STORAGE_ITEM_PANEL_ITEM = ITEMS.register("storage_item_panel", () -> new BlockItem(
-            MSBlocks.STORAGE_ITEM_PANEL_BLOCK.get(),
+            SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get(),
             new Item.Properties()
     ));
 
     public static final DeferredHolder<Item, Item> TEST_BLOCK_ITEM = ITEMS.register("test_block_item", () -> new BlockItem(
-            MSBlocks.TEST_BLOCK.get(),
+            SWISSBlocks.TEST_BLOCK.get(),
             new Item.Properties()
     ));
 

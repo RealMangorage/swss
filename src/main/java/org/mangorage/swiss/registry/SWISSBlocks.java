@@ -14,7 +14,7 @@ import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlock
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
-public final class MSBlocks {
+public final class SWISSBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.createBlocks(SWISS.MODID);
 
     public static final DeferredHolder<Block, StorageBlock> STORAGE_ITEM_INTERFACE_BLOCK = BLOCKS.register("storage_item_interface", () -> new StorageBlock(

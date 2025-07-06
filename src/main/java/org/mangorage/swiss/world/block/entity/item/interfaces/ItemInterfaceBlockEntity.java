@@ -8,7 +8,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
-import org.mangorage.swiss.registry.MSBlockEntities;
+import org.mangorage.swiss.registry.SWISSBlockEntities;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
@@ -17,7 +17,7 @@ public final class ItemInterfaceBlockEntity extends BaseStorageBlockEntity imple
     private int ticks = 0;
 
     public ItemInterfaceBlockEntity(BlockPos pos, BlockState blockState) {
-        super(MSBlockEntities.STORAGE_ITEM_INTERFACE_BLOCK_ENTITY.get(), pos, blockState);
+        super(SWISSBlockEntities.STORAGE_ITEM_INTERFACE_BLOCK_ENTITY.get(), pos, blockState);
     }
 
 

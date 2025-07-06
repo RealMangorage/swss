@@ -4,7 +4,7 @@ import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.registry.SWISSBlocks;
 
 public final class MSLangProvider extends LanguageProvider {
 
@@ -19,9 +19,9 @@ public final class MSLangProvider extends LanguageProvider {
         add("itemGroup." + SWISS.MODID, "Mango Storage");
 
         //Blocks
-        addBlock(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
-        addBlock(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
-        addBlock(MSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
+        addBlock(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
+        addBlock(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
+        addBlock(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
     }
 
 

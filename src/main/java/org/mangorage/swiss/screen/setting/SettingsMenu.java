@@ -2,19 +2,14 @@ package org.mangorage.swiss.screen.setting;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
-import org.mangorage.swiss.registry.MSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
-import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
 import java.util.List;
 

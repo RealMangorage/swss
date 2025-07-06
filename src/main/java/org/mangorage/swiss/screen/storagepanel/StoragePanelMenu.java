@@ -1,6 +1,5 @@
 package org.mangorage.swiss.screen.storagepanel;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,19 +7,20 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
-import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.storage.util.IPacketRequest;
+import org.mangorage.swiss.util.ItemHandlerLookup;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.List;
 
-public final class StoragePanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest {
+public final class StoragePanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
     private StorageItemPanelBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
@@ -77,12 +77,10 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     private static final int TE_INVENTORY_SLOT_COUNT = 3;  // must be the number of slots you have!
 
 
+
     @Override
-    public void clicked(int slotId, int button, ClickType clickType, Player player) {
-        if (player.level().isClientSide) return;
-        if (clickType == ClickType.PICKUP) {
-            setCarried(Items.ACACIA_FENCE.getDefaultInstance());
-        }
+    public boolean clickMenuButton(Player player, int id) {
+        return super.clickMenuButton(player, id);
     }
 
     @Override
@@ -120,7 +118,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     @Override
     public boolean stillValid(@NotNull Player player) {
-        return stillValid(ContainerLevelAccess.create(player.level(), blockPos), player, MSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
+        return stillValid(ContainerLevelAccess.create(player.level(), blockPos), player, SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
@@ -130,11 +128,6 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
             }
         }
     }
-
-    private void addStorageSlots() {
-
-    }
-
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
@@ -153,6 +146,22 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     public void requested(ServerPlayer player) {
         final var items = blockEntity.getItems();
         player.connection.send(new SyncNetworkItemsPacketS2C(items));
+    }
+
+    @Override
+    public void clicked(ClickType clickType, ItemStack itemStack) {
+        if (clickType == ClickType.PICKUP) {
+            if (getCarried().isEmpty()) {
+
+                final var lookup = ItemHandlerLookup.getLookupForExtract(blockEntity.getNetwork());
+
+                lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()))
+                        .ifPresent(result -> {
+                            setCarried(result.stack());
+                        });
+
+            }
+        }
     }
 
     public record ItemList(List<ItemStack> stacks) {}

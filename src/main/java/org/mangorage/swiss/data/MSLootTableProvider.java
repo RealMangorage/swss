@@ -6,7 +6,7 @@ import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.swiss.registry.MSBlocks;
+import org.mangorage.swiss.registry.SWISSBlocks;
 
 import java.util.Set;
 
@@ -18,8 +18,8 @@ public class MSLootTableProvider extends VanillaBlockLoot {
     @Override
     protected void generate() {
 
-        this.dropSelf(MSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
-        this.dropSelf(MSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get());
+        this.dropSelf(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
+        this.dropSelf(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get());
 
     }
 

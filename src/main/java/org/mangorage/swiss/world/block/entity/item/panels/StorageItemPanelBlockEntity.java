@@ -1,17 +1,13 @@
 package org.mangorage.swiss.world.block.entity.item.panels;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.mangorage.swiss.storage.device.DeviceType;
-import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
-import org.mangorage.swiss.registry.MSBlockEntities;
+import org.mangorage.swiss.registry.SWISSBlockEntities;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
@@ -25,7 +21,7 @@ public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity im
     public final ContainerData data;
 
     public StorageItemPanelBlockEntity(BlockPos pos, BlockState blockState) {
-        super(MSBlockEntities.STORAGE_ITEM_PANEL_BLOCK_ENTITY.get(), pos, blockState);
+        super(SWISSBlockEntities.STORAGE_ITEM_PANEL_BLOCK_ENTITY.get(), pos, blockState);
         //Whatever data we need to store in the container
         this.data = new ContainerData() {
             @Override

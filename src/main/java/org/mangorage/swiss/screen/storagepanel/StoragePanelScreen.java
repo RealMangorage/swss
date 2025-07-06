@@ -1,24 +1,36 @@
 package org.mangorage.swiss.screen.storagepanel;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.RequestNetworkItemsPacketC2S;
+import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
+import org.mangorage.swiss.util.NumbersUtil;
+import org.mangorage.swiss.world.ItemCount;
 
+import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +52,8 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private static final int SCROLLBAR_Y_OFFSET = 18;
     private boolean isDraggingScrollbar = false;
     private int dragOffsetY = 0;
+
+    private ItemStack selected = null;
 
 
     private static final ResourceLocation TEXTURE =
@@ -178,15 +192,36 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             int y = startY + row * 18;
 
             ItemStack finalTotalItemStack = new ItemStack(item, count);
+            finalTotalItemStack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(finalTotalItemStack.getCount()));
 
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
                 guiGraphics.renderTooltip(font, finalTotalItemStack, mouseX, mouseY);
+                selected = finalTotalItemStack;
+            } else {
+                selected = null;
             }
             guiGraphics.renderItem(finalTotalItemStack, x, y);
-            guiGraphics.renderItemDecorations(font, finalTotalItemStack, x, y);
+            renderAmount(guiGraphics, x, y, NumbersUtil.format(finalTotalItemStack.getCount()), 0xFFFFFF);
         }
 
         renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    public static void renderAmount(final GuiGraphics graphics, final int x, final int y, final String text, final int color) {
+        renderAmount(graphics, x, y, text, color, text.length() <= 3);
+    }
+
+    public static void renderAmount(final GuiGraphics graphics, final int x, final int y, final String text, final int color, final boolean large) {
+        final Font font = Minecraft.getInstance().font;
+        final PoseStack poseStack = graphics.pose();
+        poseStack.pushPose();
+        // Large amounts overlap with the slot lines (see Minecraft behavior)
+        poseStack.translate(x + (large ? 1D : 0D), y + (large ? 1D : 0D), 300);
+        if (!large) {
+            poseStack.scale(0.5F, 0.5F, 1);
+        }
+        graphics.drawString(font, text, (large ? 16 : 30) - font.width(text), large ? 8 : 22, color, true);
+        poseStack.popPose();
     }
 
     @Override
@@ -207,6 +242,10 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             } else {
                 isDraggingScrollbar = false;
             }
+        }
+
+        if (selected != null) {
+            Minecraft.getInstance().player.connection.send(new MenuInteractPacketC2S(selected, ClickType.PICKUP.ordinal()));
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
