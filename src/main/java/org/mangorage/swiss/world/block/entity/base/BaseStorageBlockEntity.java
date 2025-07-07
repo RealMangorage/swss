@@ -1,6 +1,8 @@
 package org.mangorage.swiss.world.block.entity.base;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,6 +25,37 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         super(type, pos, blockState);
     }
 
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        CompoundTag deviceDataTag = new CompoundTag();
+        deviceDataTag.putInt("networkId", networkId);
+        if (owner != null)
+            deviceDataTag.putUUID("owner", owner);
+        tag.put("deviceData", deviceDataTag);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        final var deviceDataTag = tag.getCompound("deviceData");
+        if (deviceDataTag.contains("owner"))
+            setOwner(deviceDataTag.getUUID("owner"));
+        this.networkId = deviceDataTag.getInt("networkId");
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (getLevel().isClientSide()) {
+
+        } else {
+            setNetworkId(networkId);
+        }
+    }
+
+    // CUSTOM NETWORK STUFF
+
     protected void connectToNetwork() {
         if (owner == null || loaded) return; // Dont load if Owner hasnt been set yet!
         loaded = true;
@@ -39,8 +72,10 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
     @Override
     public void setNetworkId(int id) {
-        getNetwork()
-                .unregisterDevice(this);
+        if (this.networkId != id) {
+            getNetwork()
+                    .unregisterDevice(this);
+        }
         networkId = id;
         getNetwork()
                 .registerDevice(this);

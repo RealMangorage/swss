@@ -1,19 +1,28 @@
 package org.mangorage.swiss;
 
+import com.mojang.datafixers.DSL;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagTypes;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.maps.MapIndex;
 import net.minecraft.world.level.storage.LevelResource;
 import org.mangorage.swiss.storage.network.Network;
+import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.network.UnknownNetwork;
+import org.mangorage.swiss.storage.network.User;
+
+import java.io.File;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -24,8 +33,10 @@ public final class StorageNetworkManager extends SavedData {
         return new SavedData.Factory<>(StorageNetworkManager::new, StorageNetworkManager::load);
     }
 
-    public static StorageNetworkManager load(CompoundTag tag, HolderLookup.Provider registries) {
-        return new StorageNetworkManager();
+    static StorageNetworkManager load(CompoundTag tag, HolderLookup.Provider registries) {
+        final var networkManager = new StorageNetworkManager();
+        networkManager.loadInternal(tag, registries);
+        return networkManager;
     }
 
     public static StorageNetworkManager getInstance() {
@@ -33,25 +44,12 @@ public final class StorageNetworkManager extends SavedData {
     }
 
     static void start(MinecraftServer server) {
-
-        instance = factory().deserializer().apply(new CompoundTag(), server.registryAccess());
+        instance = server.getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(factory(), "swiss-networks");
         instance.setDirty(false);
     }
 
     static void stop() {
         instance = null;
-    }
-
-    static void save(MinecraftServer server) {
-        try {
-            getInstance().checkDirty();
-            getInstance().save(
-                    server.getWorldPath(LevelResource.ROOT).resolve("data/swiss-network-data.dat").toFile(),
-                    server.registryAccess()
-            );
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
     }
 
     private final Int2ObjectArrayMap<Network> networks = new Int2ObjectArrayMap<>();
@@ -65,7 +63,19 @@ public final class StorageNetworkManager extends SavedData {
     public Network getOrCreateNetwork(MinecraftServer server, UUID owner, int id) {
         if (server == null) throw new IllegalStateException("Cant create network, need MinecraftServer Instance...");
         if (owner == null) return UnknownNetwork.INSTANCE;
-        return networks.computeIfAbsent(id, id2 -> new Network(owner));
+        return networks.computeIfAbsent(id, id2 -> {
+            final var network = new Network();
+            final var user = new User(owner);
+            user.addPermission(Permission.OWNER);
+            network.registerUser(user);
+            return network;
+        });
+    }
+
+    @Override
+    public void save(File file, HolderLookup.Provider registries) {
+        checkDirty();
+        super.save(file, registries);
     }
 
     void checkDirty() {
@@ -76,6 +86,7 @@ public final class StorageNetworkManager extends SavedData {
             }
         }
     }
+
 
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
@@ -92,5 +103,15 @@ public final class StorageNetworkManager extends SavedData {
         data.put("networks", networksTag);
 
         return data;
+    }
+
+    void loadInternal(CompoundTag data, HolderLookup.Provider registries) {
+        final var networkTags = data.getList("networks", Tag.TAG_COMPOUND);
+        for (int id = 0; id < networkTags.size(); id++) {
+            CompoundTag networkTag = networkTags.getCompound(id);
+            Network network = new Network();
+            network.load(networkTag, registries);
+            networks.put(networkTag.getInt("id"), network);
+        }
     }
 }

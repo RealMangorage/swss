@@ -67,6 +67,15 @@ public final class User {
             permissionsTag.add(StringTag.valueOf(permission.name()));
         }
         compoundTag.put("permissions", permissionsTag);
+        compoundTag.putUUID("id", uuid);
         return compoundTag;
+    }
+
+    public void load(CompoundTag userTag, HolderLookup.Provider registries) {
+        final var permissionsTag = userTag.getList("permissions", StringTag.TAG_STRING);
+        for (int id = 0; id < permissionsTag.size(); id++) {
+            final var permissionTag = permissionsTag.getString(id);
+            addPermission(Permission.valueOf(permissionTag));
+        }
     }
 }

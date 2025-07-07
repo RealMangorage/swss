@@ -10,10 +10,10 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public final class UnknownNetwork extends Network {
-    public static final UnknownNetwork INSTANCE = new UnknownNetwork(UUID.randomUUID());
+    public static final UnknownNetwork INSTANCE = new UnknownNetwork();
 
-    UnknownNetwork(UUID owner) {
-        super(owner);
+    UnknownNetwork() {
+        super();
     }
 
     @Override
@@ -39,7 +39,7 @@ public final class UnknownNetwork extends Network {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag network, HolderLookup.Provider registries) {
         return null;
     }
 }

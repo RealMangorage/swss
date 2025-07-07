@@ -46,17 +46,12 @@ public final class SWISS {
         modEventBus.addListener(Packets::register);
 
         NeoForge.EVENT_BUS.addListener(SWISS::serverStarting);
-        NeoForge.EVENT_BUS.addListener(SWISS::serverStopping);
         NeoForge.EVENT_BUS.addListener(SWISS::serverStopped);
         NeoForge.EVENT_BUS.addListener(SWISS::onTooltip);
     }
 
     public static void serverStarting(ServerStartingEvent event) {
-        StorageNetworkManager.start();
-    }
-
-    public static void serverStopping(ServerTickEvent.Post event) {
-        StorageNetworkManager.save(event.getServer());
+        StorageNetworkManager.start(event.getServer());
     }
 
     public static void serverStopped(ServerStoppedEvent event) {

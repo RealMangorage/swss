@@ -2,6 +2,8 @@ package org.mangorage.swiss.storage.network;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.TagTypes;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
 
@@ -17,11 +19,7 @@ public sealed class Network permits UnknownNetwork {
     private final Map<UUID, User> userMap = new HashMap<>();
     private boolean dirty = true;
 
-    public Network(UUID owner) {
-        final var ownerUser = new User(owner);
-        ownerUser.addPermission(Permission.OWNER);
-        this.userMap.put(owner, ownerUser);
-    }
+    public Network() {}
 
     public boolean hasPermission(UUID userId, Set<Permission> permissions) {
         final var user = userMap.get(userId);
@@ -77,11 +75,27 @@ public sealed class Network permits UnknownNetwork {
         return dirty;
     }
 
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag network, HolderLookup.Provider registries) {
         dirty = false;
+
+
+        ListTag userTags = new ListTag();
         userMap.forEach((id, user) -> {
-            compoundTag.put(id.toString(), user.save(new CompoundTag(), registries));
+            userTags.add(user.save(new CompoundTag(), registries));
         });
-        return compoundTag;
+
+        network.put("users", userTags);
+
+        return network;
+    }
+
+    public void load(CompoundTag networkTag, HolderLookup.Provider registries) {
+        final var userTags = networkTag.getList("users", ListTag.TAG_COMPOUND);
+        for (int id = 0; id < userTags.size(); id++) {
+            final var userTag = userTags.getCompound(id);
+            final var user = new User(userTag.getUUID("id"));
+            user.load(userTag, registries);
+            userMap.put(user.getUUID(), user);
+        }
     }
 }
