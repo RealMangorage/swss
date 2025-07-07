@@ -3,8 +3,8 @@ package org.mangorage.swiss.storage.device;
 import java.util.UUID;
 
 public interface IDevice {
-    int getNetworkId();
-    void setNetworkId(int id);
+    UUID getNetworkId();
+    void setNetworkId(UUID id);
 
     void setOwner(UUID uuid);
     UUID getOwner();

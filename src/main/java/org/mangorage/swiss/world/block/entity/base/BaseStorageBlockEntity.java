@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice {
 
-    private int networkId = 0;
+    private UUID networkId = StorageNetworkManager.DEFAULT_NETWORK_ID;
     private UUID owner = null;
     private boolean loaded = false;
 
@@ -29,7 +29,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         CompoundTag deviceDataTag = new CompoundTag();
-        deviceDataTag.putInt("networkId", networkId);
+        deviceDataTag.putUUID("networkId", networkId);
         if (owner != null)
             deviceDataTag.putUUID("owner", owner);
         tag.put("deviceData", deviceDataTag);
@@ -41,7 +41,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         final var deviceDataTag = tag.getCompound("deviceData");
         if (deviceDataTag.contains("owner"))
             setOwner(deviceDataTag.getUUID("owner"));
-        this.networkId = deviceDataTag.getInt("networkId");
+        this.networkId = deviceDataTag.getUUID("networkId");
     }
 
     @Override
@@ -71,7 +71,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     @Override
-    public void setNetworkId(int id) {
+    public void setNetworkId(UUID id) {
         if (this.networkId != id) {
             getNetwork()
                     .unregisterDevice(this);
@@ -92,7 +92,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     @Override
-    public int getNetworkId() {
+    public UUID getNetworkId() {
         return networkId;
     }
 

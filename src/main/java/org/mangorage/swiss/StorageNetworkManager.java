@@ -1,32 +1,25 @@
 package org.mangorage.swiss;
 
-import com.mojang.datafixers.DSL;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagTypes;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.saveddata.maps.MapIndex;
-import net.minecraft.world.level.storage.LevelResource;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.storage.network.User;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public final class StorageNetworkManager extends SavedData {
+    public static final UUID DEFAULT_NETWORK_ID = UUID.fromString("e9e13bd4-2b2b-49a3-b522-25ae87ed1c0f");
+
     private static StorageNetworkManager instance = null;
 
     static SavedData.Factory<StorageNetworkManager> factory() {
@@ -44,7 +37,7 @@ public final class StorageNetworkManager extends SavedData {
     }
 
     static void start(MinecraftServer server) {
-        instance = server.getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(factory(), "swiss-networks");
+        instance = server.getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(factory(), "swiss-network-data");
         instance.setDirty(false);
     }
 
@@ -52,7 +45,7 @@ public final class StorageNetworkManager extends SavedData {
         instance = null;
     }
 
-    private final Int2ObjectArrayMap<Network> networks = new Int2ObjectArrayMap<>();
+        private final Map<UUID, Network> networkMap = new HashMap<>();
 
     StorageNetworkManager() {}
 
@@ -60,10 +53,10 @@ public final class StorageNetworkManager extends SavedData {
      * Handles getting a network
      * Cant use on a client!
      */
-    public Network getOrCreateNetwork(MinecraftServer server, UUID owner, int id) {
+    public Network getOrCreateNetwork(MinecraftServer server, UUID owner, UUID id) {
         if (server == null) throw new IllegalStateException("Cant create network, need MinecraftServer Instance...");
         if (owner == null) return UnknownNetwork.INSTANCE;
-        return networks.computeIfAbsent(id, id2 -> {
+        return networkMap.computeIfAbsent(id, id2 -> {
             final var network = new Network();
             final var user = new User(owner);
             user.addPermission(Permission.OWNER);
@@ -79,7 +72,7 @@ public final class StorageNetworkManager extends SavedData {
     }
 
     void checkDirty() {
-        for (Network network : networks.values()) {
+        for (Network network : networkMap.values()) {
             if (network.isDirty()) {
                 setDirty(true);
                 break;
@@ -94,9 +87,9 @@ public final class StorageNetworkManager extends SavedData {
 
         final var networksTag = new ListTag();
 
-        networks.forEach((id, network) -> {
+        networkMap.forEach((id, network) -> {
             CompoundTag networkTag = new CompoundTag();
-            networkTag.putInt("id", id);
+            networkTag.putUUID("id", id);
             networksTag.add(network.save(networkTag, registries));
         });
 
@@ -111,7 +104,7 @@ public final class StorageNetworkManager extends SavedData {
             CompoundTag networkTag = networkTags.getCompound(id);
             Network network = new Network();
             network.load(networkTag, registries);
-            networks.put(networkTag.getInt("id"), network);
+            networkMap.put(networkTag.getUUID("id"), network);
         }
     }
 }
