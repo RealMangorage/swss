@@ -88,6 +88,8 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     }
 
 
+
+
     //Todo : make shift clicking out of the network work
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
@@ -109,7 +111,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
                     sourceSlot.set(leftover);
                 }
                 sourceSlot.setChanged();
-                return originalStack;
+                return ItemStack.EMPTY;
             }
             // Shift-clicked in TE (network) slots: try to extract full stack and put into player inventory
             else if (index >= TE_INVENTORY_FIRST_SLOT_INDEX && index < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
