@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.screen.util.Interact;
 
-public record MenuInteractPacketC2S(ItemStack itemStack, int clickType) implements CustomPacketPayload {
+public record MenuInteractPacketC2S(ItemStack itemStack, int clickType, int button) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<MenuInteractPacketC2S> TYPE = new CustomPacketPayload.Type<>(SWISS.modRL("interact_menu"));
 
 
@@ -18,12 +18,13 @@ public record MenuInteractPacketC2S(ItemStack itemStack, int clickType) implemen
         final var player = ctx.player();
 
         if (player.containerMenu instanceof Interact interact)
-            interact.clicked(ClickType.values()[pkt.clickType()], pkt.itemStack());
+            interact.clicked(ClickType.values()[pkt.clickType()], pkt.itemStack(), pkt.button());
     };
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MenuInteractPacketC2S> STREAM_CODEC = StreamCodec.composite(
             ItemStack.OPTIONAL_STREAM_CODEC, MenuInteractPacketC2S::itemStack,
             ByteBufCodecs.INT, MenuInteractPacketC2S::clickType,
+            ByteBufCodecs.INT, MenuInteractPacketC2S::button,
             MenuInteractPacketC2S::new
     );
 
