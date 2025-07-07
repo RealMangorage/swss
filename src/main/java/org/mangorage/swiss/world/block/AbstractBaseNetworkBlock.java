@@ -3,6 +3,8 @@ package org.mangorage.swiss.world.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.util.IRightClickable;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
@@ -31,6 +34,21 @@ public abstract class AbstractBaseNetworkBlock extends Block implements EntityBl
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         if (function == null) return null;
         return function.apply(blockPos, blockState);
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (placer.getType() == EntityType.PLAYER) {
+            final var be = level.getBlockEntity(pos);
+            if (be instanceof IDevice device)
+                device.setOwner(placer.getUUID());
+        }
     }
 
     @Override

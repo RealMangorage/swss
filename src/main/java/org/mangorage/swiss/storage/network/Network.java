@@ -3,10 +3,8 @@ package org.mangorage.swiss.storage.network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -22,9 +20,18 @@ public final class Network {
         this.userMap.put(owner, ownerUser);
     }
 
+    public boolean hasPermission(UUID userId, Set<Permission> permissions) {
+        final var user = userMap.get(userId);
+        if (user == null) return false;
+        return user.hasPermission(permissions);
+    }
 
-    public Stream<ItemDevice> getItemDevices() {
-        return itemDevices.stream();
+    public void registerUser(User user) {
+        userMap.put(user.getUUID(), user);
+    }
+
+    public void unregisterUser(User user) {
+        userMap.remove(user.getUUID());
     }
 
     public void registerDevice(IDevice device) {
@@ -35,5 +42,9 @@ public final class Network {
     public void unregisterDevice(IDevice device) {
         if (device instanceof ItemDevice itemDevice)
             itemDevices.remove(itemDevice);
+    }
+
+    public Stream<ItemDevice> getItemDevices() {
+        return itemDevices.stream();
     }
 }

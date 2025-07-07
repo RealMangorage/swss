@@ -2,6 +2,7 @@ package org.mangorage.swiss.screen.storagepanel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,11 +15,14 @@ import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
+import org.mangorage.swiss.storage.network.Network;
+import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.List;
+import java.util.Set;
 
 public final class StoragePanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
@@ -161,11 +165,19 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         player.connection.send(new SyncNetworkItemsPacketS2C(items));
     }
 
+    boolean hasPermission(Network network, Set<Permission> permissions) {
+        return network.hasPermission(player.getUUID(), permissions);
+    }
+
     @Override
     public void clicked(ClickType clickType, ItemStack itemStack) {
         if (clickType == ClickType.PICKUP) {
             if (getCarried().isEmpty() && itemStack != null) {
-
+                // Check Permissions
+                if (!hasPermission(blockEntity.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_EXTRACT))) {
+                    player.sendSystemMessage(Component.literal("No Permission to extract from storage!"));
+                    return;
+                }
                 final var lookup = ItemHandlerLookup.getLookupForExtract(blockEntity.getNetwork());
                 final var result = lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()));
                 if (!result.isEmpty()) {
@@ -173,6 +185,10 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
                 }
 
             } else if (!getCarried().isEmpty()) {
+                if (!hasPermission(blockEntity.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_INSERT))) {
+                    player.sendSystemMessage(Component.literal("No Permission to insert into storage!"));
+                    return;
+                }
                 final var stack = getCarried();
                 final var lookup = ItemHandlerLookup.getLookupForInsert(blockEntity.getNetwork());
                 final var remainder = lookup.insertIntoHandlers(stack);

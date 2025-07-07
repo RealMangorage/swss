@@ -15,6 +15,7 @@ import java.util.UUID;
 public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice {
 
     private int networkId = 0;
+    private UUID owner = null;
     private boolean loaded = false;
 
     public BaseStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -22,7 +23,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     protected void connectToNetwork() {
-        if (loaded) return;
+        if (owner == null || loaded) return; // Dont load if Owner hasnt been set yet!
         loaded = true;
         getNetwork().registerDevice(this);
         if (getBlockState().hasProperty(InterfaceNetworkBlock.CONNECTED)) {
@@ -31,7 +32,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     public Network getNetwork() {
-        return StorageNetworkManager.getInstance().getOrCreateNetwork(level.getServer(), UUID.randomUUID(), getNetworkId());
+        return StorageNetworkManager.getInstance().getOrCreateNetwork(level.getServer(), getOwner(), getNetworkId());
     }
 
     @Override
@@ -41,6 +42,16 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         networkId = id;
         getNetwork()
                 .registerDevice(this);
+    }
+
+    @Override
+    public void setOwner(UUID uuid) {
+        this.owner = uuid;
+    }
+
+    @Override
+    public UUID getOwner() {
+        return owner;
     }
 
     @Override

@@ -36,6 +36,14 @@ public final class User {
         return uuid;
     }
 
+    public boolean hasPermission(Set<Permission> permissions) {
+        for (Permission permission : permissions) {
+            if (hasPermission(permission))
+                return true;
+        }
+        return false;
+    }
+
     public boolean hasPermission(Permission permission) {
         return permissions.contains(permission);
     }
