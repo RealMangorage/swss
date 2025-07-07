@@ -71,7 +71,7 @@ public final class SWISS {
         return ResourceLocation.fromNamespaceAndPath(MODID, name);
     }
 
-    @EventBusSubscriber(modid = SWISS.MODID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = SWISS.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
 
         @SubscribeEvent
