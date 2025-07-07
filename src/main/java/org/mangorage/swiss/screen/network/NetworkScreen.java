@@ -1,41 +1,41 @@
-package org.mangorage.swiss.screen.setting;
+package org.mangorage.swiss.screen.network;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
-import org.mangorage.swiss.util.MouseUtil;
-public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implements IUpdatable {
 
-    private int networkButtonX = 10;
-    private int getNetworkButtonY = 22;
+import java.util.List;
+
+public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implements IUpdatable {
+
+    private final List<String> stringList = List.of(
+            "network1", "network2", "network3", "network4", "network5", "network6");
+
+    private int scrollOffset = 0;
+    private final int maxVisibleLines = 3; // Adjust depending on UI height
+    private final int lineHeight = 12;
+
+
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/settings_gui.png");
-    static final ResourceLocation NETWORK_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_network.png");
 
-    public SettingsScreen(SettingsMenu menu, Inventory inventory, Component component) {
+    public NetworkScreen(NetworkMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.imageHeight = 165;
         this.imageWidth = 175;
-
     }
 
     @Override
     public void update() {
     }
-
 
     @Override
     protected void init() {
@@ -49,9 +49,6 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         RenderSystem.setShaderTexture(0, TEXTURE);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        //Buttons
-        guiGraphics.blit(NETWORK_BUTTON, leftPos + 10, topPos + 22, 0, 0, 17, 17, 17, 17);
-
     }
 
 
@@ -60,19 +57,21 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
+        int x = leftPos + 10;
+        int y = topPos + 30;
+
+        int listSize = stringList.size();
+        int end = Math.min(scrollOffset + maxVisibleLines, listSize);
+
+        for (int i = scrollOffset; i < end; i++) {
+            guiGraphics.drawString(font, stringList.get(i), x, y + (i - scrollOffset) * lineHeight, 0xFFFFFF);
+        }
+
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + networkButtonX, topPos + getNetworkButtonY, 0, 0, 17, 17)) {
-            Minecraft.getInstance().getConnection().send(
-                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Network
-            );
-        }
-
-
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -85,7 +84,13 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        int maxOffset = Math.max(0, stringList.size() - maxVisibleLines);
+        if (scrollY < 0) { // Scrolling down
+            scrollOffset = Math.min(scrollOffset + 1, maxOffset);
+        } else if (scrollY > 0) { // Scrolling up
+            scrollOffset = Math.max(scrollOffset - 1, 0);
+        }
+        return true;
     }
 
     @Override

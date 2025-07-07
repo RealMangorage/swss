@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.StorageNetworkManager;
@@ -15,7 +16,7 @@ import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 
 import java.util.UUID;
 
-public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice, INetworkHolder {
 
     private UUID networkId = StorageNetworkManager.DEFAULT_NETWORK_ID;
     private UUID owner = null;
@@ -56,10 +57,17 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
     // CUSTOM NETWORK STUFF
 
+    @Override
+    public boolean shouldCache() {
+        return false;
+    }
+
     protected void connectToNetwork() {
         if (owner == null || loaded) return; // Dont load if Owner hasnt been set yet!
         loaded = true;
         getNetwork().registerDevice(this);
+
+        // TODO: FIX so it properly reflects connection state
         if (getBlockState().hasProperty(InterfaceNetworkBlock.CONNECTED)) {
             getLevel().setBlock(getBlockPos(), getBlockState().setValue(InterfaceNetworkBlock.CONNECTED, true), Block.UPDATE_ALL);
         }

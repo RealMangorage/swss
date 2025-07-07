@@ -49,9 +49,9 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     public void sendAllDataToRemote() {
         super.sendAllDataToRemote();
         if (!level.isClientSide()) {
-            final var items = blockEntity.getItems();
-            final var sp = (ServerPlayer) player;
-            sp.connection.send(new SyncNetworkItemsPacketS2C(items));
+            //final var items = blockEntity.getItems();
+            //final var sp = (ServerPlayer) player;
+            //sp.connection.send(new SyncNetworkItemsPacketS2C(items));
         }
     }
 

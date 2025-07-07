@@ -50,26 +50,6 @@ public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity im
         }
     }
 
-    public List<ItemStack> getItems() {
-        return getNetwork()
-                .getItemDevices()
-                .filter(device -> device.isValidDevice() && device.canExtract(DeviceType.ITEM))
-                .map(ItemDevice::getItemHandler)
-                .filter(Objects::nonNull)
-                .map(handler -> {
-                    List<ItemStack> stacks = new ArrayList<>();
-
-                    for (int slot = 0; slot < handler.getSlots(); slot++) {
-                        stacks.add(handler.getStackInSlot(slot).copy());
-                    }
-
-                    return stacks;
-                })
-                .flatMap(List::stream)
-                .filter(item -> !item.isEmpty())
-                .toList();
-    }
-
     @Override
     public IItemHandler getItemHandler() {
         return null;

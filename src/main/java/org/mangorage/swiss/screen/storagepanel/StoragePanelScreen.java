@@ -322,19 +322,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         }
 
         if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
-
-            // This is probably not the best way to handle this but i think we need some sort of data
-
-            // create network
-            // block entity, data
-            System.out.println("HELLOOOO");
-
-            ContainerData data = new SimpleContainerData(1);
-            assert Objects.requireNonNull(this.minecraft).player != null;
-            this.minecraft.player.openMenu(new SimpleMenuProvider(
-                    (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, this.minecraft.player.blockPosition(), data),
-                    Component.literal("TEST")), (buf -> buf.writeBlockPos(this.minecraft.player.blockPosition())));
-
+            Minecraft.getInstance().getConnection().send(
+                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Settings
+            );
         }
 
         if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + rowButtonX, topPos + rowButtonY, 0, 0, 17, 17)) {
@@ -356,14 +346,14 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
                     if (!stack.isEmpty()) {
                         assert Minecraft.getInstance().player != null;
                         Minecraft.getInstance().player.connection.send(
-                                new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal())
+                                new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal(), 0)
                         );
                     }
                 } else {
                     // Clicked on empty slot - send packet with empty ItemStack or special action
                     assert Minecraft.getInstance().player != null;
                     Minecraft.getInstance().player.connection.send(
-                            new MenuInteractPacketC2S(ItemStack.EMPTY, ClickType.PICKUP.ordinal())
+                            new MenuInteractPacketC2S(ItemStack.EMPTY, ClickType.PICKUP.ordinal(), 0)
                     );
                 }
                 return true;

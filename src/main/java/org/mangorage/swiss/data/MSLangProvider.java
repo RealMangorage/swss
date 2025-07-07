@@ -25,7 +25,9 @@ public final class MSLangProvider extends LanguageProvider {
 
         //GUI
         addGUITranslation("settings_menu", "Open Settings Menu");
+        addGUITranslation("settings_menu_title", "Settings");
         addGUITranslation("row_menu", "Click to change rows");
+        addGUITranslation("network_menu_title", "Network Settings");
     }
 
 

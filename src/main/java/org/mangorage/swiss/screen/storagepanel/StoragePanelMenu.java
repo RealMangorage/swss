@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -11,7 +12,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
+import org.mangorage.swiss.storage.device.DeviceType;
+import org.mangorage.swiss.storage.device.INetworkHolder;
+import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
@@ -22,12 +27,14 @@ import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public final class StoragePanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
-    private StorageItemPanelBlockEntity blockEntity;
+    private INetworkHolder networkHolder;
     List<ItemStack> itemStacks = List.of();
     private Level level;
     private ContainerData data;
@@ -39,14 +46,13 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     }
 
-
     public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
         super(MSMenuTypes.STORAGE_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
-        this.blockEntity = (StorageItemPanelBlockEntity) this.level.getBlockEntity(blockPos);
+        this.networkHolder = level.getBlockEntity(blockPos) instanceof INetworkHolder holder ? holder : null;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
@@ -55,11 +61,31 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     }
 
+    List<ItemStack> getNetworkItems() {
+        return networkHolder.getNetwork()
+                .getItemDevices()
+                .filter(device -> device.isValidDevice() && device.canExtract(DeviceType.ITEM))
+                .map(ItemDevice::getItemHandler)
+                .filter(Objects::nonNull)
+                .map(handler -> {
+                    List<ItemStack> stacks = new ArrayList<>();
+
+                    for (int slot = 0; slot < handler.getSlots(); slot++) {
+                        stacks.add(handler.getStackInSlot(slot).copy());
+                    }
+
+                    return stacks;
+                })
+                .flatMap(List::stream)
+                .filter(item -> !item.isEmpty())
+                .toList();
+    }
+
     @Override
     public void sendAllDataToRemote() {
         super.sendAllDataToRemote();
         if (!level.isClientSide()) {
-            final var items = blockEntity.getItems();
+            final var items = getNetworkItems();
             final var sp = (ServerPlayer) player;
             sp.connection.send(new SyncNetworkItemsPacketS2C(items));
         }
@@ -103,7 +129,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         if (!playerIn.level().isClientSide()) {
             // Shift-clicked in player inventory: try to insert into network
             if (index < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-                var insertHandler = ItemHandlerLookup.getLookupForInsert(blockEntity.getNetwork());
+                var insertHandler = ItemHandlerLookup.getLookupForInsert(networkHolder.getNetwork());
                 ItemStack leftover = insertHandler.insertIntoHandlers(sourceStack);
 
                 if (leftover.isEmpty()) {
@@ -164,7 +190,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     @Override
     public void requested(ServerPlayer player) {
-        final var items = blockEntity.getItems();
+        final var items = getNetworkItems();
         player.connection.send(new SyncNetworkItemsPacketS2C(items));
     }
 
@@ -173,41 +199,42 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     }
 
     @Override
-    public void clicked(ClickType clickType, ItemStack itemStack) {
+    public void clicked(ClickType clickType, ItemStack itemStack, int button) {
 
-        if (itemStack.isEmpty()) {
-            if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
+        if (button == 1) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("gui.swiss.settings_menu")), buf -> buf.writeBlockPos(blockPos)
+            );
 
+        } else {
+            if (clickType == ClickType.PICKUP) {
+                if (getCarried().isEmpty() && itemStack != null) {
+                    // Check Permissions
+                    if (!hasPermission(networkHolder.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_EXTRACT))) {
+                        player.sendSystemMessage(Component.literal("No Permission to extract from storage!"));
+                        return;
+                    }
+                    final var lookup = ItemHandlerLookup.getLookupForExtract(networkHolder.getNetwork());
+                    final var result = lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()));
+                    if (!result.isEmpty()) {
+                        setCarried(result);
+                    }
 
-            }
-        }
-
-
-        if (clickType == ClickType.PICKUP) {
-            if (getCarried().isEmpty() && itemStack != null) {
-                // Check Permissions
-                if (!hasPermission(blockEntity.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_EXTRACT))) {
-                    player.sendSystemMessage(Component.literal("No Permission to extract from storage!"));
-                    return;
-                }
-                final var lookup = ItemHandlerLookup.getLookupForExtract(blockEntity.getNetwork());
-                final var result = lookup.findAny(itemStack.getItem(), Math.min(itemStack.getCount(), itemStack.getMaxStackSize()));
-                if (!result.isEmpty()) {
-                    setCarried(result);
-                }
-
-            } else if (!getCarried().isEmpty()) {
-                if (!hasPermission(blockEntity.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_INSERT))) {
-                    player.sendSystemMessage(Component.literal("No Permission to insert into storage!"));
-                    return;
-                }
-                final var stack = getCarried();
-                final var lookup = ItemHandlerLookup.getLookupForInsert(blockEntity.getNetwork());
-                final var remainder = lookup.insertIntoHandlers(stack);
-                if (remainder.isEmpty()) {
-                    setCarried(ItemStack.EMPTY);
-                } else {
-                    setCarried(remainder);
+                } else if (!getCarried().isEmpty()) {
+                    if (!hasPermission(networkHolder.getNetwork(), Set.of(Permission.OWNER, Permission.ADMIN, Permission.CAN_INSERT))) {
+                        player.sendSystemMessage(Component.literal("No Permission to insert into storage!"));
+                        return;
+                    }
+                    final var stack = getCarried();
+                    final var lookup = ItemHandlerLookup.getLookupForInsert(networkHolder.getNetwork());
+                    final var remainder = lookup.insertIntoHandlers(stack);
+                    if (remainder.isEmpty()) {
+                        setCarried(ItemStack.EMPTY);
+                    } else {
+                        setCarried(remainder);
+                    }
                 }
             }
         }

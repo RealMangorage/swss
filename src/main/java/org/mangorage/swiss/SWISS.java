@@ -17,6 +17,7 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
+import org.mangorage.swiss.screen.network.NetworkScreen;
 import org.mangorage.swiss.screen.setting.SettingsScreen;
 import org.mangorage.swiss.screen.test.TestScreen;
 import org.mangorage.swiss.network.Packets;
@@ -80,6 +81,7 @@ public final class SWISS {
             event.register(MSMenuTypes.TEST_MENU.get(), TestScreen::new);
             event.register(MSMenuTypes.SETTINGS_MENU.get(), SettingsScreen::new);
             event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
+            event.register(MSMenuTypes.NETWORK_MENU.get(), NetworkScreen::new);
         }
 
     }

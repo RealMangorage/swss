@@ -2,6 +2,9 @@ package org.mangorage.swiss.screen.setting;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -9,11 +12,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.network.NetworkMenu;
+import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.util.IPacketRequest;
 
 import java.util.List;
 
-public final class SettingsMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
+public final class SettingsMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
     List<ItemStack> itemStacks = List.of();
     private Level level;
@@ -106,6 +112,17 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
 
     }
 
+    @Override
+    public void clicked(ClickType clickType, ItemStack itemStack, int button) {
+
+        if (button == 1) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new NetworkMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("gui.swiss.network_menu_title")), buf -> buf.writeBlockPos(blockPos)
+            );
+        }
+    }
 
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
@@ -126,6 +143,11 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
         if (object instanceof ItemList(List<ItemStack> stacks)) {
             this.itemStacks = stacks;
         }
+    }
+
+    @Override
+    public void requested(ServerPlayer player) {
+
     }
 
     public record ItemList(List<ItemStack> stacks) {}
