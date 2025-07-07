@@ -9,6 +9,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
+import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
@@ -31,10 +32,13 @@ public final class ItemInterfaceBlockEntity extends BaseStorageBlockEntity imple
 
     @Override
     public IItemHandler getItemHandler() {
-        BlockPos above = getBlockPos().above();
-        BlockState aboveState = level.getBlockState(above);
-        BlockEntity aboveEntity = level.getBlockEntity(above);
-        return Capabilities.ItemHandler.BLOCK.getCapability(level, above, aboveState, aboveEntity, Direction.DOWN);
+        BlockPos outputPos = getBlockPos().relative(getBlockState().getValue(InterfaceNetworkBlock.FACING).getOpposite());
+        BlockState outputState = level.getBlockState(outputPos);
+        BlockEntity outputBE = level.getBlockEntity(outputPos);
+
+        if (outputState.isAir()) return null;
+
+        return Capabilities.ItemHandler.BLOCK.getCapability(level, outputPos, outputState, outputBE, Direction.DOWN);
     }
 
     @Override
