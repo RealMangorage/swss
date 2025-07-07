@@ -15,13 +15,16 @@ public final class MSBlockStatesProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-
+    /*
         simpleBlockWithItem(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get(), models()
                 .cubeAll(blockTexture(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get())));
 
         simpleBlockWithItem(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get(), models()
                 .cubeAll(blockTexture(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()).getPath(), blockTexture(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())));
+    */
+
     }
+
 
 
     @Override

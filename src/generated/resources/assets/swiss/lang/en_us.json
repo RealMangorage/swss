@@ -2,5 +2,7 @@
   "block.swiss.exporter_item_interface": "Item Exporter Interface",
   "block.swiss.storage_item_interface": "Item Storage Interface",
   "block.swiss.storage_item_panel": "Item Storage Panel",
+  "gui.swiss.row_menu": "Click to change rows",
+  "gui.swiss.settings_menu": "Open Settings Menu",
   "itemGroup.swiss": "Mango Storage"
 }

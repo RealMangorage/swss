@@ -22,6 +22,10 @@ public final class MSLangProvider extends LanguageProvider {
         addBlock(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
+
+        //GUI
+        addGUITranslation("settings_menu", "Open Settings Menu");
+        addGUITranslation("row_menu", "Click to change rows");
     }
 
 

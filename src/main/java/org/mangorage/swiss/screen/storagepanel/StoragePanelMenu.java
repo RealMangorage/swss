@@ -19,6 +19,7 @@ import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
+import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.List;
@@ -143,14 +144,14 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     public void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 36 + (StoragePanelScreen.visibleRows * 18) + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18 + 17, 36 + (StoragePanelScreen.visibleRows * 18) + i * 18));
             }
         }
     }
 
     public void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 94  + (StoragePanelScreen.visibleRows * 18) ));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18 + 17, 94  + (StoragePanelScreen.visibleRows * 18) ));
         }
     }
 
@@ -173,6 +174,15 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
 
     @Override
     public void clicked(ClickType clickType, ItemStack itemStack) {
+
+        if (itemStack.isEmpty()) {
+            if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
+
+
+            }
+        }
+
+
         if (clickType == ClickType.PICKUP) {
             if (getCarried().isEmpty() && itemStack != null) {
                 // Check Permissions

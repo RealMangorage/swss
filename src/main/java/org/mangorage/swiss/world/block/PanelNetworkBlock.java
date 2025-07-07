@@ -102,7 +102,7 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
                 ContainerData data = storageItemPanelBlockEntity.data;
                 player.openMenu(new SimpleMenuProvider(
                         (windowId, playerInventory, playerEntity) -> new StoragePanelMenu(windowId, playerInventory, blockPos, data),
-                        Component.literal("TEST")), (buf -> buf.writeBlockPos(blockPos)));
+                        Component.literal("Item Crafting Panel")), (buf -> buf.writeBlockPos(blockPos)));
             }
             return InteractionResult.SUCCESS;
         }

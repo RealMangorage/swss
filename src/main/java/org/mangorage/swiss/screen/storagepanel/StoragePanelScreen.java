@@ -11,23 +11,28 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.registry.SWISSDataComponents;
+import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.setting.SettingsMenu;
+import org.mangorage.swiss.screen.setting.SettingsScreen;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.util.NumbersUtil;
 import org.mangorage.swiss.world.ItemCount;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu> implements IUpdatable {
 
@@ -49,6 +54,11 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private String lastSearchText = "";
     private ItemStack selected = ItemStack.EMPTY;
 
+    private int settingsButtonX = 0;
+    private int settingsButtonY = 2;
+    private int rowButtonX = 0;
+    private int rowButtonY = 20;
+
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_gui.png");
@@ -56,6 +66,10 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_row.png");
     static final ResourceLocation SCROLL_SPRITE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_scroll.png");
+    static final ResourceLocation SETTINGS_BUTTON =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_settings.png");
+    static final ResourceLocation ROW_BUTTON =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_row.png");
 
     public StoragePanelScreen(StoragePanelMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -64,8 +78,10 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         System.out.println("Constructor allItems size: " + this.allItems.size());  // Debug
         this.filteredItems = new ArrayList<>(allItems);
         this.imageHeight = 175 + (visibleRows - 3) * 18;
-        this.imageWidth = 192;
+        this.imageWidth = 209;
         this.inventoryLabelY = this.imageHeight - 98;
+        this.inventoryLabelX = 25;
+        this.titleLabelX = 25;
         this.lastSearchText = "";
     }
 
@@ -103,15 +119,26 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         return Math.max(3, maxRows);
     }
 
-    private void cycleVisibleRows() {
+    private void cycleVisibleRows(int button) {
         int maxRows = calculateMaxRows();
 
-        visibleRows++;
-        if (visibleRows > maxRows) {
-            visibleRows = 3;
+        if (button == 0) { // Left click - cycle forward
+            visibleRows++;
+            if (visibleRows > maxRows) {
+                visibleRows = 3; // min visible rows
+            }
+        } else if (button == 1) { // Right click - cycle backward
+            visibleRows--;
+            if (visibleRows < 3) {
+                visibleRows = maxRows; // wrap to max
+            }
         }
-        itemsPerPage = visibleRows * COLUMNS;
 
+        updateGuiLayout();
+    }
+
+    private void updateGuiLayout() {
+        itemsPerPage = visibleRows * COLUMNS;
         this.imageHeight = 175 + (visibleRows - 3) * 18;
         this.inventoryLabelY = this.imageHeight - 98;
 
@@ -129,7 +156,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         this.clearWidgets();
         this.menu.slots.clear();
 
-        searchBox = new EditBox(font, leftPos + 69 , topPos + 3, 100, 14, Component.literal("Search"));
+        searchBox = new EditBox(font, leftPos + 86 + 37 , topPos + 3, 80, 14, Component.literal("Search"));
         searchBox.setResponder(this::onSearchChanged);
         addRenderableWidget(searchBox);
 
@@ -168,37 +195,33 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
 
-        int baseHeight = 72; // Height of top (non-tiling) part
-        int tileHeight = 18; // Height of 1 row tile
+        int baseHeight = 72;
+        int tileHeight = 18;
         int extraRows = visibleRows - 3;
 
-        int slotRowWidth = 162; // Width for the slot row sprite (adjust to your texture width)
-        int slotRowHeight = 18; // Height for one slot row sprite
-        int startX = leftPos + 7; // X offset for slot row sprites (adjust to align with slots)
-        int startY = topPos + 19;  // Y offset where first row starts (adjust as needed)
+        int slotRowWidth = 162;
+        int slotRowHeight = 18;
+        int startX = leftPos + 24;
+        int startY = topPos + 19;
 
-        // --- 1. Draw top static section (first 3 rows) ---
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, baseHeight);
 
-        // --- 2. Tile middle strip (starts at y=72 in texture) ---
         int tileSourceX = 0;
-        int tileSourceY = 54; // ← This is the key fix
-        int tileWidth = 192;
+        int tileSourceY = 54;
+        int tileWidth = 209;
 
         for (int i = 0; i < extraRows; i++) {
             int drawY = topPos + baseHeight + (i * tileHeight);
             guiGraphics.blit(TEXTURE, leftPos, drawY, tileSourceX, tileSourceY, tileWidth, tileHeight);
         }
 
-        // --- 3. Draw bottom GUI section (e.g., inventory slots) ---
-        int bottomSourceY = baseHeight + tileHeight - 18; // starts after tiling zone
+        int bottomSourceY = baseHeight + tileHeight - 18;
         int bottomDestY = topPos + baseHeight + (extraRows * tileHeight);
-        int bottomHeight = 101; // height of bottom section in texture
+        int bottomHeight = 101;
 
         guiGraphics.blit(TEXTURE, leftPos, bottomDestY, 0, bottomSourceY, imageWidth, bottomHeight);
 
-        // --- 4. Draw scrollbar ---
-        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET;
+        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET + 17;
         int scrollbarY = topPos + SCROLLBAR_Y_OFFSET;
         int handleHeight = 15;
         int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
@@ -209,15 +232,16 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
         }
 
-        // --- 5. Draw rows ON TOP ---
         RenderSystem.setShaderTexture(0, ROW_SPRITE); // Make sure to bind row texture
         for (int i = 0; i < visibleRows; i++) {
             int y = startY + (i * slotRowHeight);
             guiGraphics.blit(ROW_SPRITE, startX, y, 0, 0, slotRowWidth, slotRowHeight, slotRowWidth, slotRowHeight);
         }
 
-        // Debug: draw semi-transparent red rectangle to check row positions (optional)
-        // guiGraphics.fill(startX, startY, startX + slotRowWidth, startY + visibleRows * slotRowHeight, 0x80FF0000);
+        //Buttons
+        guiGraphics.blit(SETTINGS_BUTTON, leftPos, topPos + 2, 0, 0, 17, 17, 17, 17);
+        guiGraphics.blit(ROW_BUTTON, leftPos, topPos + 20, 0, 0, 17, 17, 17, 17);
+
     }
 
 
@@ -232,7 +256,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
         searchBox.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        int startX = leftPos + 8;
+        int startX = leftPos + 25;
         int startY = topPos + 20; // Adjusted to fit the GUI layoute
 
         for (int i = 0; i < itemsPerPage; i++) {
@@ -258,6 +282,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         }
 
         renderTooltip(guiGraphics, mouseX, mouseY);
+        renderButtonTooltips(guiGraphics, mouseX, mouseY, leftPos, topPos);
     }
 
     public static void renderAmount(final GuiGraphics graphics, final int x, final int y, final String text, final int color) {
@@ -279,9 +304,10 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int startX = leftPos + 8;
+        int startX = leftPos + 25;
         int startY = topPos + 20;
         int slotSize = 18;
+
 
         if (button == 1 && searchBox != null) {
             if (searchBox.isMouseOver(mouseX, mouseY)) {
@@ -295,14 +321,29 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             searchBox.setFocused(false);
         }
 
-        if (button == 1 && (searchBox == null || !searchBox.isMouseOver(mouseX, mouseY))) {
-            cycleVisibleRows();
-            return true;
+        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
+
+            // This is probably not the best way to handle this but i think we need some sort of data
+
+            // create network
+            // block entity, data
+            System.out.println("HELLOOOO");
+
+            ContainerData data = new SimpleContainerData(1);
+            assert Objects.requireNonNull(this.minecraft).player != null;
+            this.minecraft.player.openMenu(new SimpleMenuProvider(
+                    (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, this.minecraft.player.blockPosition(), data),
+                    Component.literal("TEST")), (buf -> buf.writeBlockPos(this.minecraft.player.blockPosition())));
+
         }
+
+        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + rowButtonX, topPos + rowButtonY, 0, 0, 17, 17)) {
+            cycleVisibleRows(button);
+        }
+
 
         for (int i = 0; i < itemsPerPage; i++) {
             int index = scrollIndex + i;
-            if (index >= filteredItems.size()) break;
 
             int row = i / COLUMNS;
             int col = i % COLUMNS;
@@ -310,19 +351,28 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             int y = startY + row * slotSize;
 
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
-                ItemStack stack = filteredItems.get(index);
-                if (!stack.isEmpty()) {
-                    // Send interaction packet to server
+                if (index < filteredItems.size()) {
+                    ItemStack stack = filteredItems.get(index);
+                    if (!stack.isEmpty()) {
+                        assert Minecraft.getInstance().player != null;
+                        Minecraft.getInstance().player.connection.send(
+                                new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal())
+                        );
+                    }
+                } else {
+                    // Clicked on empty slot - send packet with empty ItemStack or special action
+                    assert Minecraft.getInstance().player != null;
                     Minecraft.getInstance().player.connection.send(
-                            new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal())
+                            new MenuInteractPacketC2S(ItemStack.EMPTY, ClickType.PICKUP.ordinal())
                     );
-                    return true;
                 }
+                return true;
             }
         }
 
+
         // Handle scrollbar click
-        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET;
+        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET + 17;
         int scrollbarY = topPos + SCROLLBAR_Y_OFFSET;
         int handleHeight = 15;
         int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
@@ -400,5 +450,13 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
 
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.settings_menu"), mouseX, mouseY);
+        }
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, rowButtonX, rowButtonY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.row_menu"), mouseX, mouseY);
+        }
+    }
 }
