@@ -1,44 +1,32 @@
-package org.mangorage.swiss.screen.setting;
+package org.mangorage.swiss.screen.manager;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
-import org.mangorage.swiss.util.MouseUtil;
-public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implements IUpdatable {
 
-    private int networkButtonX = 10;
-    private int networkButtonY = 22;
-    private int managerButtonX = 32;
-    private int managerButtonY = 22;
+import java.util.List;
+
+public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implements IUpdatable {
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/settings_gui.png");
-    static final ResourceLocation NETWORK_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_network.png");
-    static final ResourceLocation MANAGER_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager.png");
 
-    public SettingsScreen(SettingsMenu menu, Inventory inventory, Component component) {
+    public ManagerScreen(ManagerMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.imageHeight = 165;
         this.imageWidth = 175;
-
     }
 
     @Override
     public void update() {
     }
-
 
     @Override
     protected void init() {
@@ -52,10 +40,6 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         RenderSystem.setShaderTexture(0, TEXTURE);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        //Buttons
-        guiGraphics.blit(NETWORK_BUTTON, leftPos + networkButtonX, topPos + networkButtonY, 0, 0, 17, 17, 17, 17);
-        guiGraphics.blit(MANAGER_BUTTON, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17, 17, 17);
-
     }
 
 
@@ -64,25 +48,14 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
+        int x = leftPos + 10;
+        int y = topPos + 30;
+
         renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + networkButtonX, topPos + networkButtonY, 0, 0, 17, 17)) {
-            Minecraft.getInstance().getConnection().send(
-                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Network
-            );
-        }
-
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
-            Minecraft.getInstance().getConnection().send(
-                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 2) // Open Network
-            );
-        }
-
-
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -95,7 +68,7 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return true;
     }
 
     @Override

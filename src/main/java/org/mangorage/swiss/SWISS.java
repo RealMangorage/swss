@@ -13,10 +13,9 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
+import org.mangorage.swiss.screen.manager.ManagerScreen;
 import org.mangorage.swiss.screen.network.NetworkScreen;
 import org.mangorage.swiss.screen.setting.SettingsScreen;
 import org.mangorage.swiss.screen.test.TestScreen;
@@ -82,6 +81,7 @@ public final class SWISS {
             event.register(MSMenuTypes.SETTINGS_MENU.get(), SettingsScreen::new);
             event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
             event.register(MSMenuTypes.NETWORK_MENU.get(), NetworkScreen::new);
+            event.register(MSMenuTypes.MANAGER_MENU.get(), ManagerScreen::new);
         }
 
     }

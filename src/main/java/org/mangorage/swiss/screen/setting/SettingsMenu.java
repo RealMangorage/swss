@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.manager.ManagerMenu;
 import org.mangorage.swiss.screen.network.NetworkMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
@@ -120,6 +121,13 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
                     new SimpleMenuProvider(
                             (windowId, playerInventory, playerEntity) -> new NetworkMenu(windowId, playerInventory, blockPos, data),
                             Component.translatable("gui.swiss.network_menu_title")), buf -> buf.writeBlockPos(blockPos)
+            );
+        }
+        if (button == 2) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new ManagerMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("gui.swiss.manger_menu_title")), buf -> buf.writeBlockPos(blockPos)
             );
         }
     }
