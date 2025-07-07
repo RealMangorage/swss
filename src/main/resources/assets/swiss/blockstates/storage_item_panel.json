@@ -1,10 +1,10 @@
 {
     "variants": {
-        "facing=north": { "model": "swiss:block/storage_item_panel", "y": 0 },
-        "facing=east": { "model": "swiss:block/storage_item_panel", "y": 90 },
-        "facing=south": { "model": "swiss:block/storage_item_panel", "y": 180 },
-        "facing=west": { "model": "swiss:block/storage_item_panel", "y": 270 },
-        "facing=down": { "model": "swiss:block/storage_item_panel", "x": 90 },
-        "facing=up": { "model": "swiss:block/storage_item_panel", "x": 270 }
+        "facing=north": { "model": "swiss:block/item/storage_panel", "y": 0 },
+        "facing=east": { "model": "swiss:block/item/storage_panel", "y": 90 },
+        "facing=south": { "model": "swiss:block/item/storage_panel", "y": 180 },
+        "facing=west": { "model": "swiss:block/item/storage_panel", "y": 270 },
+        "facing=down": { "model": "swiss:block/item/storage_panel", "x": 90 },
+        "facing=up": { "model": "swiss:block/item/storage_panel", "x": 270 }
     }
 }

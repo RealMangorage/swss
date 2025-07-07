@@ -1,5 +1,6 @@
 package org.mangorage.swiss.world.block;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -31,9 +32,24 @@ import org.jetbrains.annotations.Nullable;
 import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
+
+    private static final Map<Direction, VoxelShape> SHAPE_CACHE = Util.make(new EnumMap<>(Direction.class), map -> {
+        double inset = 1.0;          // 1 pixel inset on each side (16 - 2 = 14)
+        double extent = 15.0;        // 16 - 1 = 15
+        double thickness = 2.0;      // 2 pixels thick
+
+        map.put(Direction.NORTH, Block.box(inset, inset, 16.0 - thickness, extent, extent, 16.0));
+        map.put(Direction.SOUTH, Block.box(inset, inset, 0.0, extent, extent, thickness));
+        map.put(Direction.WEST,  Block.box(16.0 - thickness, inset, inset, 16.0, extent, extent));
+        map.put(Direction.EAST,  Block.box(0.0, inset, inset, thickness, extent, extent));
+        map.put(Direction.UP,    Block.box(inset, 0.0, inset, extent, thickness, extent));
+        map.put(Direction.DOWN,  Block.box(inset, 16.0 - thickness, inset, extent, 16.0, extent));
+    });
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -44,22 +60,8 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
 
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        Direction facing = state.getValue(FACING);
-
-        double inset = 1.0;          // 1 pixel inset on each side (16 - 2 = 14)
-        double extent = 15.0;        // 16 - 1 = 15
-        double thickness = 2.0;      // 2 pixels thick
-
-        return switch (facing) {
-            case NORTH -> Block.box(inset, inset, 16.0 - thickness, extent, extent, 16.0);
-            case SOUTH -> Block.box(inset, inset, 0.0, extent, extent, thickness);
-            case WEST  -> Block.box(16.0 - thickness, inset, inset, 16.0, extent, extent);
-            case EAST  -> Block.box(0.0, inset, inset, thickness, extent, extent);
-            case UP    -> Block.box(inset, 0.0, inset, extent, thickness, extent);
-            case DOWN  -> Block.box(inset, 16.0 - thickness, inset, extent, 16.0, extent);
-        };
+        return SHAPE_CACHE.get(state.getValue(FACING));
     }
-
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
