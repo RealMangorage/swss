@@ -13,6 +13,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
 import org.mangorage.swiss.screen.setting.SettingsScreen;
@@ -44,12 +45,17 @@ public final class SWISS {
         modEventBus.addListener(Packets::register);
 
         NeoForge.EVENT_BUS.addListener(SWISS::serverStarting);
+        NeoForge.EVENT_BUS.addListener(SWISS::serverStopping);
         NeoForge.EVENT_BUS.addListener(SWISS::serverStopped);
         NeoForge.EVENT_BUS.addListener(SWISS::onTooltip);
     }
 
     public static void serverStarting(ServerStartingEvent event) {
         StorageNetworkManager.start();
+    }
+
+    public static void serverStopping(ServerStoppingEvent event) {
+        StorageNetworkManager.save(event.getServer());
     }
 
     public static void serverStopped(ServerStoppedEvent event) {

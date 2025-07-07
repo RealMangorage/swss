@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 
 import java.util.UUID;
@@ -32,6 +33,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     public Network getNetwork() {
+        if (getOwner() == null) return UnknownNetwork.INSTANCE;
         return StorageNetworkManager.getInstance().getOrCreateNetwork(level.getServer(), getOwner(), getNetworkId());
     }
 

@@ -1,6 +1,11 @@
 package org.mangorage.swiss.storage.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -54,5 +59,14 @@ public final class User {
 
     public void removePermission(Permission permission) {
         permissions.remove(permission);
+    }
+
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
+        final var permissionsTag = new ListTag();
+        for (Permission permission : permissions) {
+            permissionsTag.add(StringTag.valueOf(permission.name()));
+        }
+        compoundTag.put("permissions", permissionsTag);
+        return compoundTag;
     }
 }

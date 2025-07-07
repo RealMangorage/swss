@@ -1,5 +1,8 @@
 package org.mangorage.swiss.storage.network;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
 
@@ -10,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public final class Network {
+public sealed class Network permits UnknownNetwork {
     private final Set<ItemDevice> itemDevices = new HashSet<>();
     private final Map<UUID, User> userMap = new HashMap<>();
 
@@ -46,5 +49,12 @@ public final class Network {
 
     public Stream<ItemDevice> getItemDevices() {
         return itemDevices.stream();
+    }
+
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
+        userMap.forEach((id, user) -> {
+            compoundTag.put(id.toString(), user.save(new CompoundTag(), registries));
+        });
+        return compoundTag;
     }
 }
