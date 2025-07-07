@@ -16,8 +16,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -32,19 +30,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
-import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
 import java.util.function.BiFunction;
 
-public final class StoragePanelBlock extends Block implements EntityBlock {
-    private final BiFunction<BlockPos, BlockState, BlockEntity> function;
+public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    public StoragePanelBlock(Properties p_49795_, BiFunction<BlockPos, BlockState, BlockEntity> function) {
-        super(p_49795_);
-        this.function = function;
+    public PanelNetworkBlock(Properties properties, BiFunction<BlockPos, BlockState, BlockEntity> function) {
+        super(properties, function);
     }
 
     @Override
@@ -84,7 +79,6 @@ public final class StoragePanelBlock extends Block implements EntityBlock {
     @Override
     public @NotNull BlockState rotate(BlockState blockState, @NotNull LevelAccessor level, @NotNull BlockPos blockPos, Rotation direction) {
         return blockState.setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)).setValue(FACING, direction.rotate(blockState.getValue(FACING)));
-
     }
 
     @Override
@@ -97,14 +91,7 @@ public final class StoragePanelBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        if (function == null) return null;
-        return function.apply(blockPos, blockState);
-    }
-
-    @Override
     public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
-
         if (!level.isClientSide()) {
 
             StorageItemPanelBlockEntity storageItemPanelBlockEntity = (StorageItemPanelBlockEntity) level.getBlockEntity(blockPos);
@@ -119,18 +106,4 @@ public final class StoragePanelBlock extends Block implements EntityBlock {
         }
         return InteractionResult.FAIL;
     }
-
-    @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return (level1, pos, state1, blockEntity) -> {
-            if (blockEntity != null && blockEntity instanceof TickingBlockEntity tickingBlockEntity) {
-                if (level.isClientSide()){
-                    tickingBlockEntity.tickClient();
-                } else {
-                    tickingBlockEntity.tickServer();
-                }
-            }
-        };
-    }
-
 }

@@ -1,12 +1,14 @@
 package org.mangorage.swiss.world.block.entity.base;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 
 import java.util.UUID;
 
@@ -23,6 +25,9 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         if (loaded) return;
         loaded = true;
         getNetwork().registerDevice(this);
+        if (getBlockState().hasProperty(InterfaceNetworkBlock.CONNECTED)) {
+            getLevel().setBlock(getBlockPos(), getBlockState().setValue(InterfaceNetworkBlock.CONNECTED, true), Block.UPDATE_ALL);
+        }
     }
 
     public Network getNetwork() {

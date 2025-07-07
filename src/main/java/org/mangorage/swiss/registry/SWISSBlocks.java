@@ -6,8 +6,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.world.block.StorageBlock;
-import org.mangorage.swiss.world.block.StoragePanelBlock;
+import org.mangorage.swiss.world.block.AbstractBaseNetworkBlock;
+import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
+import org.mangorage.swiss.world.block.PanelNetworkBlock;
 import org.mangorage.swiss.world.block.TestBlock;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
@@ -17,15 +18,15 @@ import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 public final class SWISSBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.createBlocks(SWISS.MODID);
 
-    public static final DeferredHolder<Block, StorageBlock> STORAGE_ITEM_INTERFACE_BLOCK = BLOCKS.register("storage_item_interface", () -> new StorageBlock(
+    public static final DeferredHolder<Block, InterfaceNetworkBlock> STORAGE_ITEM_INTERFACE_BLOCK = BLOCKS.register("storage_item_interface", () -> new InterfaceNetworkBlock(
             BlockBehaviour.Properties.of(), ItemInterfaceBlockEntity::new
     ));
 
-    public static final DeferredHolder<Block, StorageBlock> EXPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("exporter_item_interface", () -> new StorageBlock(
+    public static final DeferredHolder<Block, InterfaceNetworkBlock> EXPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("exporter_item_interface", () -> new InterfaceNetworkBlock(
             BlockBehaviour.Properties.of(), ItemExporterBlockEntity::new
     ));
 
-    public static final DeferredHolder<Block, Block> STORAGE_ITEM_PANEL_BLOCK = BLOCKS.register("storage_item_panel", () -> new StoragePanelBlock(
+    public static final DeferredHolder<Block, Block> STORAGE_ITEM_PANEL_BLOCK = BLOCKS.register("storage_item_panel", () -> new PanelNetworkBlock(
             BlockBehaviour.Properties.of(), StorageItemPanelBlockEntity::new
     ));
 
