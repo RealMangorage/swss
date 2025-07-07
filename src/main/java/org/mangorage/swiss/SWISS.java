@@ -14,6 +14,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
 import org.mangorage.swiss.screen.setting.SettingsScreen;
@@ -54,7 +55,7 @@ public final class SWISS {
         StorageNetworkManager.start();
     }
 
-    public static void serverStopping(ServerStoppingEvent event) {
+    public static void serverStopping(ServerTickEvent.Post event) {
         StorageNetworkManager.save(event.getServer());
     }
 
