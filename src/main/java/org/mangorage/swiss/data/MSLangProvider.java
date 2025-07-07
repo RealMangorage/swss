@@ -26,9 +26,21 @@ public final class MSLangProvider extends LanguageProvider {
         //GUI
         addGUITranslation("settings_menu", "Open Settings Menu");
         addGUITranslation("settings_menu_title", "Settings");
+        addGUITranslation("network_settings", "Open Network Settings");
+        addGUITranslation("create_join_network_settings", "Open Create/Join Network Settings");
         addGUITranslation("row_menu", "Click to change rows");
         addGUITranslation("network_menu_title", "Network Settings");
         addGUITranslation("manger_menu_title", "Manage Network");
+        addGUITranslation("name", "Network Names");
+        addGUITranslation("set_name", "Set Network Name");
+        addGUITranslation("password", "Network Password");
+        addGUITranslation("set_password", "Set Network Password");
+        addGUITranslation("known_networks", "Known Networks");
+        addGUITranslation("create_network", "Create Network");
+        addGUITranslation("join_network", "Join Network");
+        addGUITranslation("create_settings", "Join Network?");
+        addGUITranslation("join_settings", "Create Network?");
+
     }
 
 

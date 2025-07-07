@@ -127,7 +127,7 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
             player.openMenu(
                     new SimpleMenuProvider(
                             (windowId, playerInventory, playerEntity) -> new ManagerMenu(windowId, playerInventory, blockPos, data),
-                            Component.translatable("gui.swiss.manger_menu_title")), buf -> buf.writeBlockPos(blockPos)
+                            Component.literal("")), buf -> buf.writeBlockPos(blockPos)
             );
         }
     }

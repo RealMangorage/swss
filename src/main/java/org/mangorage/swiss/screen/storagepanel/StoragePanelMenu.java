@@ -1,5 +1,6 @@
 package org.mangorage.swiss.screen.storagepanel;
 
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -45,6 +46,8 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
 
     }
+
+
 
     public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
         super(MSMenuTypes.STORAGE_MENU.get(), containerID);

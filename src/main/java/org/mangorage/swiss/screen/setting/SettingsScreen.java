@@ -65,6 +65,7 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         renderTooltip(guiGraphics, mouseX, mouseY);
+        renderButtonTooltips(guiGraphics, mouseX, mouseY, leftPos, topPos);
     }
 
     @Override
@@ -107,5 +108,14 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
+
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, networkButtonX, networkButtonY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.network_settings"), mouseX, mouseY);
+        }
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, managerButtonX, managerButtonY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.create_join_network_settings"), mouseX, mouseY);
+        }
+    }
 
 }
