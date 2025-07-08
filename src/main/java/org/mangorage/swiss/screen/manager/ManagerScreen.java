@@ -143,10 +143,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
                 managerModes = ManagerModes.JOIN;
                 init();
             }
+            else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
+                //create new network
+            }
+
         } else if (managerModes == ManagerModes.JOIN) {
             if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
                 managerModes = ManagerModes.CREATE;
                 init();
+            }
+            else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
+                // Join the selected network
             }
         }
 
