@@ -2,6 +2,8 @@
   "block.swiss.exporter_item_interface": "Item Exporter Interface",
   "block.swiss.storage_item_interface": "Item Storage Interface",
   "block.swiss.storage_item_panel": "Item Storage Panel",
+  "gui.swiss.confirm_create": "Create New Network",
+  "gui.swiss.confirm_join": "Join Selected Network",
   "gui.swiss.create_join_network_settings": "Open Create/Join Network Settings",
   "gui.swiss.create_network": "Create Network",
   "gui.swiss.create_settings": "Join Network?",

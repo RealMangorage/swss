@@ -29,6 +29,10 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
 
     private int managerButtonX = 155;
     private int managerButtonY = 4;
+    private int confirmButtonX = 155;
+    private int confirmButtonY = 55;
+
+
     private ManagerModes managerModes = ManagerModes.CREATE;
 
     private static final ResourceLocation TEXTURE =
@@ -37,6 +41,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager_join.png");
     private static final ResourceLocation BUTTON_CREATE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager_create.png");
+    private static final ResourceLocation BUTTON_CONFIRM =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_confirm.png");
 
     public ManagerScreen(ManagerMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -81,6 +87,9 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             guiGraphics.blit(BUTTON_JOIN, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17, 17, 17);
         }
 
+        guiGraphics.blit(BUTTON_CONFIRM, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17, 17, 17);
+
+
     }
 
 
@@ -88,6 +97,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
+
         if (managerModes == ManagerModes.CREATE) {
             createNetworkNameEditBox.render(guiGraphics, mouseX, mouseY, partialTicks);
             createNetworkPasswordEditBox.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -200,10 +210,16 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, managerButtonX, managerButtonY, 17, 17)) {
                 guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.create_settings"), mouseX, mouseY);
             }
+            else if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, confirmButtonX, confirmButtonY, 17, 17)) {
+                guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.confirm_create"), mouseX, mouseY);
+            }
         }
         if (managerModes == ManagerModes.JOIN) {
             if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, managerButtonX, managerButtonY, 17, 17)) {
                 guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.join_settings"), mouseX, mouseY);
+            }
+            else if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, confirmButtonX, confirmButtonY, 17, 17)) {
+                guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.confirm_join"), mouseX, mouseY);
             }
         }
     }
