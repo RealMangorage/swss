@@ -2,12 +2,14 @@ package org.mangorage.swiss.storage.device;
 
 import org.mangorage.swiss.storage.network.Network;
 
+import java.util.UUID;
+
 public interface INetworkHolder {
     Network getNetwork();
+    void setNetwork(UUID id);
 
     /**
-     * Tells whatever needs to getNework() wether or not it should
-     * cache the result itself, or rely on getNetwork() only
+     * Tells whatever that it needs cache getNetwork()
      */
     boolean shouldCache();
 }

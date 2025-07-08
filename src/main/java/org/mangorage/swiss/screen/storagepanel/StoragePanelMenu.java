@@ -2,6 +2,7 @@ package org.mangorage.swiss.screen.storagepanel;
 
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -202,7 +203,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     }
 
     @Override
-    public void clicked(ClickType clickType, ItemStack itemStack, int button) {
+    public void clicked(ItemStack itemStack, CompoundTag extraData, ClickType clickType, int button) {
 
         if (button == 1) {
             player.openMenu(

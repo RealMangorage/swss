@@ -3,6 +3,12 @@ package org.mangorage.swiss.world.block;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -19,11 +25,18 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
+import org.mangorage.swiss.storage.network.NetworkInfo;
+import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -145,5 +158,44 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
 
     public @NotNull FluidState getFluidState(BlockState blockState) {
         return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
+    }
+
+    @Override
+    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
+        if (!level.isClientSide()) {
+
+            BaseStorageBlockEntity storageItemPanelBlockEntity = (BaseStorageBlockEntity) level.getBlockEntity(blockPos);
+            //MENU OPEN//
+            if (storageItemPanelBlockEntity instanceof BaseStorageBlockEntity) {
+                ContainerData data = new ContainerData() {
+                    @Override
+                    public int get(int index) {
+                        return 0;
+                    }
+
+                    @Override
+                    public void set(int index, int value) {
+
+                    }
+
+                    @Override
+                    public int getCount() {
+                        return 0;
+                    }
+                };
+                player.openMenu(new SimpleMenuProvider(
+                                (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                                Component.literal("Configure Block")
+                        ),
+                        buf -> {
+                            buf.writeBlockPos(blockPos);
+                            final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                            NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                        }
+                );
+            }
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.FAIL;
     }
 }

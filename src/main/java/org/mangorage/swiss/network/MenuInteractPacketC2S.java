@@ -1,5 +1,8 @@
 package org.mangorage.swiss.network;
 
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -10,7 +13,28 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.screen.util.Interact;
 
-public record MenuInteractPacketC2S(ItemStack itemStack, int clickType, int button) implements CustomPacketPayload {
+public record MenuInteractPacketC2S(ItemStack itemStack, CompoundTag extraData, int clickType, int button) implements CustomPacketPayload {
+
+    public MenuInteractPacketC2S(ItemStack itemStack, int clickType, int button) {
+        this(itemStack, new CompoundTag(), clickType, button);
+    }
+
+    public MenuInteractPacketC2S(CompoundTag extraData, int clickType, int button) {
+        this(ItemStack.EMPTY, extraData, clickType, button);
+    }
+
+    public MenuInteractPacketC2S(int clickType, int button) {
+        this(new CompoundTag(), clickType, button);
+    }
+
+    public MenuInteractPacketC2S(CompoundTag extraData, int button) {
+        this(extraData, 0, button);
+    }
+
+    public MenuInteractPacketC2S(int button) {
+        this(0, button);
+    }
+
     public static final CustomPacketPayload.Type<MenuInteractPacketC2S> TYPE = new CustomPacketPayload.Type<>(SWISS.modRL("interact_menu"));
 
 
@@ -18,11 +42,12 @@ public record MenuInteractPacketC2S(ItemStack itemStack, int clickType, int butt
         final var player = ctx.player();
 
         if (player.containerMenu instanceof Interact interact)
-            interact.clicked(ClickType.values()[pkt.clickType()], pkt.itemStack(), pkt.button());
+            interact.clicked(pkt.itemStack(), pkt.extraData(), ClickType.values()[pkt.clickType()], pkt.button());
     };
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MenuInteractPacketC2S> STREAM_CODEC = StreamCodec.composite(
             ItemStack.OPTIONAL_STREAM_CODEC, MenuInteractPacketC2S::itemStack,
+            ByteBufCodecs.COMPOUND_TAG, MenuInteractPacketC2S::extraData,
             ByteBufCodecs.INT, MenuInteractPacketC2S::clickType,
             ByteBufCodecs.INT, MenuInteractPacketC2S::button,
             MenuInteractPacketC2S::new

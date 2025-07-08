@@ -6,12 +6,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.JoinNetworkPacketC2S;
+import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
@@ -122,9 +126,13 @@ public class ConfigureBlockNetworkScreen extends AbstractContainerScreen<Configu
         // Join button click
         if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
             if (selectedNetwork != null) {
+                final var data = new CompoundTag();
+                data.putUUID("id", selectedNetwork.networkId());
+
                 Minecraft.getInstance().player.connection.send(
-                        new JoinNetworkPacketC2S(selectedNetwork.networkId(), joinNetworkPasswordEditBox.getValue())
+                        new MenuInteractPacketC2S(data, 1)
                 );
+
                 Minecraft.getInstance().player.closeContainer();
             } else {
                 // Optional: feedback if nothing selected

@@ -22,8 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class StorageNetworkManager extends SavedData {
-    public static final UUID DEFAULT_NETWORK_ID = UUID.fromString("e9e13bd4-2b2b-49a3-b522-25ae87ed1c0f");
-
     private static StorageNetworkManager instance = null;
 
     static SavedData.Factory<StorageNetworkManager> factory() {

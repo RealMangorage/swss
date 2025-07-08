@@ -1,10 +1,12 @@
 package org.mangorage.swiss.screen.config_block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
@@ -12,23 +14,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.util.Interact;
+import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 
 import java.util.List;
 
-public final class ConfigureBlockNetworkMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
+public final class ConfigureBlockNetworkMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, Interact {
 
     private Level level;
     private ContainerData data;
     private Player player;
     private BlockPos blockPos;
     protected List<NetworkInfo> networkInfo = List.of();
+    private INetworkHolder networkHolder;
 
     public ConfigureBlockNetworkMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
         this.networkInfo = NetworkInfo.LIST_STREAM_CODEC.decode(extraData);
-
     }
 
     public ConfigureBlockNetworkMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
@@ -37,6 +41,8 @@ public final class ConfigureBlockNetworkMenu extends AbstractContainerMenu imple
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
+
+        this.networkHolder = level.getBlockEntity(blockPos) instanceof INetworkHolder holder ? holder : null;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
@@ -94,5 +100,12 @@ public final class ConfigureBlockNetworkMenu extends AbstractContainerMenu imple
     @Override
     public void sync(Object object) {
 
+    }
+
+    @Override
+    public void clicked(ItemStack itemStack, CompoundTag extraData, ClickType clickType, int button) {
+        if (extraData.contains("id") && networkHolder != null) {
+            networkHolder.setNetwork(extraData.getUUID("id"));
+        }
     }
 }

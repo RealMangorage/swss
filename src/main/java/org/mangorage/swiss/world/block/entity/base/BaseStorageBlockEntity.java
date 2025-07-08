@@ -11,16 +11,15 @@ import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.StorageNetworkManager;
-import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 
 import java.util.UUID;
 
 public abstract class BaseStorageBlockEntity extends BlockEntity implements IDevice, INetworkHolder {
 
-    private UUID networkId = StorageNetworkManager.DEFAULT_NETWORK_ID;
+    private UUID networkId = null;
     private UUID owner = null;
-    private boolean loaded = false;
+    private Network network = null;
 
     public BaseStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -51,7 +50,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         if (getLevel().isClientSide()) {
 
         } else {
-            setNetworkId(networkId);
+            setNetwork(networkId);
         }
     }
 
@@ -59,12 +58,13 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
     @Override
     public boolean shouldCache() {
-        return false;
+        return true;
     }
 
     protected void connectToNetwork() {
-        if (owner == null || loaded) return; // Dont load if Owner hasnt been set yet!
-        loaded = true;
+        if (owner == null || network != null) return;
+        this.network = StorageNetworkManager.getInstance().getNetwork(level.getServer(), getNetworkId());
+
         getNetwork().registerDevice(this);
 
         // TODO: FIX so it properly reflects connection state
@@ -74,16 +74,22 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     public Network getNetwork() {
-        return StorageNetworkManager.getInstance().getNetwork(level.getServer(), getNetworkId());
+        return network;
     }
 
     @Override
-    public void setNetworkId(UUID id) {
+    public void setNetwork(UUID id) {
         if (this.networkId != id) {
             getNetwork()
                     .unregisterDevice(this);
         }
+
+        network = null;
+
         networkId = id;
+
+        connectToNetwork();
+
         getNetwork()
                 .registerDevice(this);
     }

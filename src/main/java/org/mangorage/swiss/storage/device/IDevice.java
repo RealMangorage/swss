@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface IDevice {
     UUID getNetworkId();
-    void setNetworkId(UUID id);
+    void setNetwork(UUID id);
 
     void setOwner(UUID uuid);
     UUID getOwner();
