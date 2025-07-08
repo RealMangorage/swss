@@ -74,8 +74,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     public Network getNetwork() {
-        if (getOwner() == null) return UnknownNetwork.INSTANCE;
-        return StorageNetworkManager.getInstance().getOrCreateNetwork(level.getServer(), getOwner(), getNetworkId());
+        return StorageNetworkManager.getInstance().getNetwork(level.getServer(), getNetworkId());
     }
 
     @Override

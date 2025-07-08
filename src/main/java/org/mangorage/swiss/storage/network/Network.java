@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 public sealed class Network permits UnknownNetwork {
     private final Set<ItemDevice> itemDevices = new HashSet<>();
     private final Map<UUID, User> userMap = new HashMap<>();
+    private String networkName = null;
+
     private boolean dirty = true;
 
     public Network() {}
@@ -44,6 +46,15 @@ public sealed class Network permits UnknownNetwork {
         }
 
         dirty = true;
+    }
+
+    public void setNetworkName(String networkName) {
+        this.networkName = networkName;
+        dirty = true;
+    }
+
+    public String getNetworkName() {
+        return networkName;
     }
 
     public void registerUser(User user) {
@@ -77,13 +88,13 @@ public sealed class Network permits UnknownNetwork {
     public CompoundTag save(CompoundTag network, HolderLookup.Provider registries) {
         dirty = false;
 
-
         ListTag userTags = new ListTag();
         userMap.forEach((id, user) -> {
             userTags.add(user.save(new CompoundTag(), registries));
         });
 
         network.put("users", userTags);
+        network.putString("name", networkName);
 
         return network;
     }
@@ -96,5 +107,6 @@ public sealed class Network permits UnknownNetwork {
             user.load(userTag, registries);
             userMap.put(user.getUUID(), user);
         }
+        this.networkName = networkTag.getString("name");
     }
 }

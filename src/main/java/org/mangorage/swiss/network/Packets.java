@@ -7,6 +7,7 @@ public final class Packets {
         final var registrar = event.registrar("1.0.0")
                 .playToClient(SyncNetworkItemsPacketS2C.TYPE, SyncNetworkItemsPacketS2C.STREAM_CODEC, SyncNetworkItemsPacketS2C.HANDLER)
                 .playToServer(RequestNetworkItemsPacketC2S.TYPE, RequestNetworkItemsPacketC2S.STREAM_CODEC, RequestNetworkItemsPacketC2S.HANDLER)
-                .playToServer(MenuInteractPacketC2S.TYPE, MenuInteractPacketC2S.STREAM_CODEC, MenuInteractPacketC2S.HANDLER);
+                .playToServer(MenuInteractPacketC2S.TYPE, MenuInteractPacketC2S.STREAM_CODEC, MenuInteractPacketC2S.HANDLER)
+                .playToServer(CreateNetworkPacketC2S.TYPE, CreateNetworkPacketC2S.STREAM_CODEC, CreateNetworkPacketC2S.HANDLER);
     }
 }

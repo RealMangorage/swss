@@ -1,6 +1,7 @@
 package org.mangorage.swiss.screen.manager;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.network.CreateNetworkPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
@@ -142,24 +144,28 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
                 managerModes = ManagerModes.JOIN;
                 init();
-            }
-            else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
+            } else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
                 //create new network
+                Minecraft.getInstance().player.connection.send(
+                        new CreateNetworkPacketC2S(
+                                createNetworkNameEditBox.getValue(),
+                                createNetworkPasswordEditBox.getValue()
+                        )
+                );
+                Minecraft.getInstance().player.closeContainer();
             }
 
         } else if (managerModes == ManagerModes.JOIN) {
             if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
                 managerModes = ManagerModes.CREATE;
                 init();
-            }
-            else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
-                // Join the selected network
+            } else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
+
             }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
 
 
 

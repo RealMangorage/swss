@@ -4,7 +4,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.mangorage.swiss.storage.network.Network;
@@ -53,16 +55,28 @@ public final class StorageNetworkManager extends SavedData {
      * Handles getting a network
      * Cant use on a client!
      */
-    public Network getOrCreateNetwork(MinecraftServer server, UUID owner, UUID id) {
+    public Network getNetwork(MinecraftServer server, UUID id) {
         if (server == null) throw new IllegalStateException("Cant create network, need MinecraftServer Instance...");
-        if (owner == null) return UnknownNetwork.INSTANCE;
-        return networkMap.computeIfAbsent(id, id2 -> {
-            final var network = new Network();
-            final var user = new User(owner);
-            user.addPermission(Permission.OWNER);
-            network.registerUser(user);
-            return network;
-        });
+        return networkMap.getOrDefault(id, UnknownNetwork.INSTANCE);
+    }
+
+    public void createNetwork(String name, String password, ServerPlayer player) {
+        for (Network value : networkMap.values()) {
+            if (value.getNetworkName().equals(name)) {
+                player.sendSystemMessage(Component.literal("Unable to create network, network name already exists!"));
+                break;
+            }
+        }
+        final var network = new Network();
+        network.setNetworkName(password);
+
+        final var user = new User(player.getUUID());
+        user.addPermission(Permission.OWNER);
+
+        network.registerUser(user); // Register the owner...
+
+        networkMap.put(UUID.randomUUID(), network);
+        player.sendSystemMessage(Component.literal("Created Network!"));
     }
 
     @Override
