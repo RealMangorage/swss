@@ -16,7 +16,7 @@ public final class MSLangProvider extends LanguageProvider {
     protected void addTranslations() {
 
         //Creative Tab
-        add("itemGroup." + SWISS.MODID, "Mango Storage");
+        add("itemGroup." + SWISS.MODID, "SWISS");
 
         //Blocks
         addBlock(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
