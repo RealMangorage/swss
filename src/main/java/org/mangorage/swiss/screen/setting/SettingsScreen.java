@@ -5,13 +5,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
+import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implements IUpdatable {
@@ -20,6 +23,10 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
     private int networkButtonY = 22;
     private int managerButtonX = 32;
     private int managerButtonY = 22;
+    private int blockSettingsX = 54;
+    private int blockSettingsY = 22;
+
+    private BlockPos menuOpenPosition;
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/settings_gui.png");
@@ -27,6 +34,8 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_network.png");
     static final ResourceLocation MANAGER_BUTTON =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager.png");
+    static final ResourceLocation BLOCK_BUTTON =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_block.png");
 
     public SettingsScreen(SettingsMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -43,6 +52,11 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
     @Override
     protected void init() {
         super.init();
+        this.menuOpenPosition = this.menu.getBlockPos();
+    }
+
+    public BlockEntity getBlockEntity() {
+        return menu.getLevel().getBlockEntity(menuOpenPosition);
     }
 
     @Override
@@ -56,6 +70,9 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         guiGraphics.blit(NETWORK_BUTTON, leftPos + networkButtonX, topPos + networkButtonY, 0, 0, 17, 17, 17, 17);
         guiGraphics.blit(MANAGER_BUTTON, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17, 17, 17);
 
+        if (getBlockEntity() instanceof INetworkHolder) {
+            guiGraphics.blit(BLOCK_BUTTON, leftPos + blockSettingsX, topPos + blockSettingsY, 0, 0, 17, 17, 17, 17);
+        }
     }
 
 
@@ -81,6 +98,13 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
             Minecraft.getInstance().getConnection().send(
                     new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 2) // Open Network
             );
+        }
+        if (getBlockEntity() instanceof INetworkHolder) {
+            if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + blockSettingsX, topPos + blockSettingsY, 0, 0, 17, 17)) {
+                Minecraft.getInstance().getConnection().send(
+                        new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 3) // Open Network
+                );
+            }
         }
 
 
@@ -115,6 +139,9 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
         }
         if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, managerButtonX, managerButtonY, 17, 17)) {
             guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.create_join_network_settings"), mouseX, mouseY);
+        }
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, blockSettingsX, blockSettingsY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.configure_block_network"), mouseX, mouseY);
         }
     }
 

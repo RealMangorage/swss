@@ -14,6 +14,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.mangorage.swiss.registry.SWISSDataComponents;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkScreen;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
 import org.mangorage.swiss.screen.manager.ManagerScreen;
 import org.mangorage.swiss.screen.network.NetworkScreen;
@@ -48,6 +49,7 @@ public final class SWISS {
         NeoForge.EVENT_BUS.addListener(SWISS::serverStarting);
         NeoForge.EVENT_BUS.addListener(SWISS::serverStopped);
         NeoForge.EVENT_BUS.addListener(SWISS::onTooltip);
+        
     }
 
     public static void serverStarting(ServerStartingEvent event) {
@@ -82,6 +84,8 @@ public final class SWISS {
             event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
             event.register(MSMenuTypes.NETWORK_MENU.get(), NetworkScreen::new);
             event.register(MSMenuTypes.MANAGER_MENU.get(), ManagerScreen::new);
+            event.register(MSMenuTypes.CONFIGURE_BLOCK_NETWORK_MENU.get(), ConfigureBlockNetworkScreen::new);
+
         }
 
     }

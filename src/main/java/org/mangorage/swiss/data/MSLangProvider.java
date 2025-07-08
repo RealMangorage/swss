@@ -42,6 +42,7 @@ public final class MSLangProvider extends LanguageProvider {
         addGUITranslation("join_settings", "Create Network?");
         addGUITranslation("confirm_create", "Create New Network");
         addGUITranslation("confirm_join", "Join Selected Network");
+        addGUITranslation("configure_block_network", "Configure Block Network");
 
     }
 

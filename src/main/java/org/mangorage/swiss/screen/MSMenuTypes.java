@@ -6,6 +6,8 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkScreen;
 import org.mangorage.swiss.screen.exporter.ExporterMenu;
 import org.mangorage.swiss.screen.manager.ManagerMenu;
 import org.mangorage.swiss.screen.network.NetworkMenu;
@@ -24,6 +26,7 @@ public final class MSMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<ExporterMenu>> EXPORTER_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<NetworkMenu>> NETWORK_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<ManagerMenu>> MANAGER_MENU;
+    public static final DeferredHolder<MenuType<?>, MenuType<ConfigureBlockNetworkMenu>> CONFIGURE_BLOCK_NETWORK_MENU;
 
     static {
         STORAGE_MENU = MENUS.register("storage_menu", () -> IMenuTypeExtension.create(StoragePanelMenu::new));
@@ -32,5 +35,6 @@ public final class MSMenuTypes {
         EXPORTER_MENU = MENUS.register("exporter_menu", () -> IMenuTypeExtension.create(ExporterMenu::new));
         NETWORK_MENU = MENUS.register("network_menu", () -> IMenuTypeExtension.create(NetworkMenu::new));
         MANAGER_MENU = MENUS.register("manager_menu", () -> IMenuTypeExtension.create(ManagerMenu::new));
+        CONFIGURE_BLOCK_NETWORK_MENU = MENUS.register("configure_block_network_menu", () -> IMenuTypeExtension.create(ConfigureBlockNetworkMenu::new));
     }
 }
