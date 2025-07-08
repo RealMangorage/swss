@@ -1,4 +1,4 @@
-package org.mangorage.swiss.network;
+package org.mangorage.swiss.network.request;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

@@ -3,6 +3,7 @@ package org.mangorage.swiss.storage.network;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerPlayer;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.device.ItemDevice;
 
@@ -16,11 +17,15 @@ import java.util.stream.Stream;
 public sealed class Network permits UnknownNetwork {
     private final Set<ItemDevice> itemDevices = new HashSet<>();
     private final Map<UUID, User> userMap = new HashMap<>();
+    private final UUID networkId;
+
     private String networkName = null;
 
     private boolean dirty = true;
 
-    public Network() {}
+    public Network(UUID networkId) {
+        this.networkId = networkId;
+    }
 
     public boolean hasPermission(UUID userId, Set<Permission> permissions) {
         final var user = userMap.get(userId);
@@ -53,6 +58,10 @@ public sealed class Network permits UnknownNetwork {
         dirty = true;
     }
 
+    public UUID getId() {
+        return networkId;
+    }
+
     public String getNetworkName() {
         return networkName;
     }
@@ -65,6 +74,10 @@ public sealed class Network permits UnknownNetwork {
     public void unregisterUser(User user) {
         userMap.remove(user.getUUID());
         dirty = true;
+    }
+
+    public boolean hasUser(UUID userId) {
+        return userMap.containsKey(userId);
     }
 
     public void registerDevice(IDevice device) {
@@ -108,5 +121,9 @@ public sealed class Network permits UnknownNetwork {
             userMap.put(user.getUUID(), user);
         }
         this.networkName = networkTag.getString("name");
+    }
+
+    public NetworkInfo getInfo(ServerPlayer player) {
+        return new NetworkInfo(networkName, getId(), hasUser(player.getUUID()));
     }
 }

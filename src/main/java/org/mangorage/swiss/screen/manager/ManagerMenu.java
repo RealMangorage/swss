@@ -13,6 +13,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.network.NetworkInfo;
+
+import java.util.List;
 
 public final class ManagerMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
 
@@ -20,10 +23,11 @@ public final class ManagerMenu extends AbstractContainerMenu implements ISyncabl
     private ContainerData data;
     private Player player;
     private BlockPos blockPos;
+    protected List<NetworkInfo> networkInfo = List.of();
 
     public ManagerMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
-
+        this.networkInfo = NetworkInfo.LIST_STREAM_CODEC.decode(extraData);
     }
 
     public ManagerMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {

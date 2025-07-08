@@ -13,7 +13,7 @@ public final class UnknownNetwork extends Network {
     public static final UnknownNetwork INSTANCE = new UnknownNetwork();
 
     UnknownNetwork() {
-        super();
+        super(UUID.randomUUID());
     }
 
     @Override

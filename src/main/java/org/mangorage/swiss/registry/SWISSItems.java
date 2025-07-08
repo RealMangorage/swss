@@ -10,7 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.world.block.entity.item.SettingsItems;
+import org.mangorage.swiss.world.item.SettingsItems;
 
 public final class SWISSItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(SWISS.MODID);

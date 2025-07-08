@@ -16,7 +16,8 @@ import java.util.List;
 public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implements IUpdatable {
 
     private final List<String> stringList = List.of(
-            "network1", "network2", "network3", "network4", "network5", "network6");
+            "network1", "network2", "network3", "network4", "network5", "network6"
+    );
 
     private int scrollOffset = 0;
     private final int maxVisibleLines = 3; // Adjust depending on UI height

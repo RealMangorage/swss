@@ -11,11 +11,13 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.manager.ManagerMenu;
 import org.mangorage.swiss.screen.network.NetworkMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 
 import java.util.List;
@@ -30,7 +32,6 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
 
     public SettingsMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
-
     }
 
     public SettingsMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
@@ -120,14 +121,26 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
             player.openMenu(
                     new SimpleMenuProvider(
                             (windowId, playerInventory, playerEntity) -> new NetworkMenu(windowId, playerInventory, blockPos, data),
-                            Component.translatable("gui.swiss.network_menu_title")), buf -> buf.writeBlockPos(blockPos)
+                            Component.translatable("gui.swiss.network_menu_title")
+                    ),
+                    buf -> {
+                        buf.writeBlockPos(blockPos);
+                        final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                    }
             );
         }
         if (button == 2) {
             player.openMenu(
                     new SimpleMenuProvider(
                             (windowId, playerInventory, playerEntity) -> new ManagerMenu(windowId, playerInventory, blockPos, data),
-                            Component.literal("")), buf -> buf.writeBlockPos(blockPos)
+                            Component.literal("")
+                    ),
+                    buf -> {
+                        buf.writeBlockPos(blockPos);
+                        final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                    }
             );
         }
     }

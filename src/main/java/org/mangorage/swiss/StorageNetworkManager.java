@@ -10,12 +10,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.mangorage.swiss.storage.network.Network;
+import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.storage.network.User;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -67,16 +69,44 @@ public final class StorageNetworkManager extends SavedData {
                 break;
             }
         }
-        final var network = new Network();
-        network.setNetworkName(password);
+
+        final var network = new Network(UUID.randomUUID());
+        network.setNetworkName(name);
 
         final var user = new User(player.getUUID());
         user.addPermission(Permission.OWNER);
 
         network.registerUser(user); // Register the owner...
 
-        networkMap.put(UUID.randomUUID(), network);
+        networkMap.put(network.getId(), network);
         player.sendSystemMessage(Component.literal("Created Network!"));
+    }
+
+    public void joinNetwork(ServerPlayer player, UUID uuid, String password) {
+        final var network = getNetwork(player.getServer(), uuid);
+
+        if (network == null) {
+            player.sendSystemMessage(Component.literal("Network does not exist!"));
+            return;
+        }
+
+        if (network.hasUser(player.getUUID())) {
+            player.sendSystemMessage(Component.literal("Already in network!"));
+            return;
+        }
+
+        final var user = new User(uuid);
+        user.addPermission(Permission.ADMIN);
+        network.registerUser(user);
+
+        player.sendSystemMessage(Component.literal("Joined Network!"));
+    }
+
+    public List<NetworkInfo> getNetworkInfo(ServerPlayer player) {
+        return networkMap.values()
+                .stream()
+                .map(network -> network.getInfo(player))
+                .toList();
     }
 
     @Override
@@ -116,9 +146,9 @@ public final class StorageNetworkManager extends SavedData {
         final var networkTags = data.getList("networks", Tag.TAG_COMPOUND);
         for (int id = 0; id < networkTags.size(); id++) {
             CompoundTag networkTag = networkTags.getCompound(id);
-            Network network = new Network();
+            Network network = new Network(networkTag.getUUID("id"));
             network.load(networkTag, registries);
-            networkMap.put(networkTag.getUUID("id"), network);
+            networkMap.put(network.getId(), network);
         }
     }
 }

@@ -12,6 +12,8 @@ import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.CreateNetworkPacketC2S;
+import org.mangorage.swiss.network.JoinNetworkPacketC2S;
+import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
@@ -26,8 +28,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
     private int networkScrollIndex = 0;
     private final int VISIBLE_NETWORKS = 3;
 
-    private List<String> knownNetworks = List.of(
-            "ben", "mango", "ec2t", "asdasd", "23423", "asdasdas");
+    private List<NetworkInfo> knownNetworks = List.of();
 
     private int managerButtonX = 155;
     private int managerButtonY = 4;
@@ -50,6 +51,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
         super(menu, inventory, component);
         this.imageHeight = 165;
         this.imageWidth = 175;
+        this.knownNetworks = menu.networkInfo;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             for (int i = networkScrollIndex; i < maxIndex; i++) {
                 guiGraphics.drawString(
                         font,
-                        Component.literal(knownNetworks.get(i)).withStyle(style -> style.withUnderlined(true)),
+                        Component.literal(knownNetworks.get(i).networkName()).withStyle(style -> style.withUnderlined(true)),
                         leftPos + textAdjust + 5,
                         topPos + yOffset,
                         4210752,
@@ -160,7 +162,12 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
                 managerModes = ManagerModes.CREATE;
                 init();
             } else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
-
+                Minecraft.getInstance().player.connection.send(
+                        new JoinNetworkPacketC2S(
+                                null, ""
+                        )
+                );
+                Minecraft.getInstance().player.closeContainer();
             }
         }
 
