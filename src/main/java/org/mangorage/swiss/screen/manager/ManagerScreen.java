@@ -27,6 +27,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
     public int textAdjust = 8;
     private int networkScrollIndex = 0;
     private final int VISIBLE_NETWORKS = 3;
+    private NetworkInfo selectedNetwork;
 
     private List<NetworkInfo> knownNetworks = List.of();
 
@@ -119,14 +120,13 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             int maxIndex = Math.min(networkScrollIndex + VISIBLE_NETWORKS, knownNetworks.size());
 
             for (int i = networkScrollIndex; i < maxIndex; i++) {
-                guiGraphics.drawString(
-                        font,
-                        Component.literal(knownNetworks.get(i).networkName()).withStyle(style -> style.withUnderlined(true)),
-                        leftPos + textAdjust + 5,
-                        topPos + yOffset,
-                        4210752,
-                        false
-                );
+                NetworkInfo info = knownNetworks.get(i);
+                boolean isSelected = selectedNetwork != null && selectedNetwork.equals(info);
+
+                Component networkText = Component.literal(info.networkName())
+                        .withStyle(style -> style.withUnderlined(true).withColor(isSelected ? 0x00AAFF : 0x000000));
+
+                guiGraphics.drawString(font, networkText, leftPos + textAdjust + 5, topPos + yOffset, 4210752, false);
                 yOffset += font.lineHeight + 2;
             }
         }
@@ -157,17 +157,41 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
                 Minecraft.getInstance().player.closeContainer();
             }
 
-        } else if (managerModes == ManagerModes.JOIN) {
-            if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
+        }else if (managerModes == ManagerModes.JOIN) {
+            int yOffset = topPos + 22;
+            int maxIndex = Math.min(networkScrollIndex + VISIBLE_NETWORKS, knownNetworks.size());
+
+            for (int i = networkScrollIndex; i < maxIndex; i++) {
+                int textY = yOffset;
+                int textX = leftPos + textAdjust + 5;
+                int textWidth = font.width(knownNetworks.get(i).networkName());
+                int textHeight = font.lineHeight;
+
+                if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, textX, textY, 0, 0, textWidth, textHeight)) {
+                    selectedNetwork = knownNetworks.get(i);
+                    return true; // Consume click
+                }
+
+                yOffset += textHeight + 2;
+            }
+
+            // Join button click
+            if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
+                if (selectedNetwork != null) {
+                    Minecraft.getInstance().player.connection.send(
+                            new JoinNetworkPacketC2S(selectedNetwork.networkId(), joinNetworkPasswordEditBox.getValue())
+                    );
+                    Minecraft.getInstance().player.closeContainer();
+                } else {
+                    // Optional: feedback if nothing selected
+                    Minecraft.getInstance().player.displayClientMessage(Component.translatable("gui.swiss.no_network_selected"), true);
+                }
+            }
+
+            // Switch mode button
+            else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
                 managerModes = ManagerModes.CREATE;
                 init();
-            } else if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + confirmButtonX, topPos + confirmButtonY, 0, 0, 17, 17)) {
-                Minecraft.getInstance().player.connection.send(
-                        new JoinNetworkPacketC2S(
-                                null, ""
-                        )
-                );
-                Minecraft.getInstance().player.closeContainer();
             }
         }
 
