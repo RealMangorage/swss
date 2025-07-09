@@ -17,11 +17,12 @@ import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable {
     private int ticks = 0;
-    private Item exportItem = Items.AIR;
+    public final List<ItemStack> exportItems = new ArrayList<>();
 
     public ItemExporterBlockEntity(BlockPos pos, BlockState blockState) {
         super(SWISSBlockEntities.EXPORTER_ITEM_INTERFACE_BLOCK_ENTITY.get(), pos, blockState);
@@ -35,19 +36,22 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
 
             IItemHandler output = getOutput();
 
-            if (output != null && ItemHandlerLookup.hasRoom(output, exportItem.getDefaultInstance())) {
+            if (output != null) {
+                for (ItemStack exportStack : exportItems) {
+                    if (ItemHandlerLookup.hasRoom(output, exportStack)) {
 
-                final var lookup = ItemHandlerLookup.getLookupForExtract(getNetwork());
-                final var result = lookup.findAny(exportItem, 8);
+                        final var lookup = ItemHandlerLookup.getLookupForExtract(getNetwork());
+                        final var result = lookup.findAny(exportStack.getItem(), exportStack.getCount());
 
-                if (!result.isEmpty()) {
-                    final var remainder = ItemHandlerLookup.insertIntoHandlers(List.of(output), result);
-                    if (!remainder.isEmpty()) {
-                        lookup.insertIntoHandlers(remainder);
+                        if (!result.isEmpty()) {
+                            final var remainder = ItemHandlerLookup.insertIntoHandlers(List.of(output), result);
+                            if (!remainder.isEmpty()) {
+                                lookup.insertIntoHandlers(remainder);
+                            }
+                        }
                     }
                 }
             }
-
         }
     }
 
@@ -61,8 +65,12 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
         return Capabilities.ItemHandler.BLOCK.getCapability(level, outputPos, outputState, outputBE, Direction.DOWN);
     }
 
+    public List<ItemStack> getExportItems() {
+        return exportItems;
+    }
+
     @Override
     public void onPlayerClick(ItemStack stack, Player player) {
-        exportItem = stack.getItem();
+        //exportItem = stack.getItem();
     }
 }

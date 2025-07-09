@@ -13,13 +13,16 @@ import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
+import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.List;
 
 public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
 
-    private StorageItemPanelBlockEntity blockEntity;
+    private BaseStorageBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
     private Level level;
     private ContainerData data;
@@ -37,12 +40,16 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
-        this.blockEntity = (StorageItemPanelBlockEntity) this.level.getBlockEntity(blockPos);
+        this.blockEntity = (BaseStorageBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
 
         addDataSlots(data);
+    }
+
+    public ItemExporterBlockEntity getBlockEntity() {
+        return (ItemExporterBlockEntity) blockEntity;
     }
 
     @Override
@@ -75,35 +82,7 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        Slot sourceSlot = slots.get(index);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
-        ItemStack sourceStack = sourceSlot.getItem();
-        ItemStack copyOfSourceStack = sourceStack.copy();
-
-        // Check if the slot clicked is one of the vanilla container slots
-        if (index < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-            // This is a vanilla container slot so merge the stack into the tile inventory
-            if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX
-                    + TE_INVENTORY_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;  // EMPTY_ITEM
-            }
-        } else if (index < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
-            // This is a TE slot so merge the stack into the players inventory
-            if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else {
-            System.out.println("Invalid slotIndex:" + index);
-            return ItemStack.EMPTY;
-        }
-        // If stack size == 0 (the entire stack was moved) set slot contents to null
-        if (sourceStack.getCount() == 0) {
-            sourceSlot.set(ItemStack.EMPTY);
-        } else {
-            sourceSlot.setChanged();
-        }
-        sourceSlot.onTake(playerIn, sourceStack);
-        return copyOfSourceStack;
+        return ItemStack.EMPTY;
     }
 
     @Override
