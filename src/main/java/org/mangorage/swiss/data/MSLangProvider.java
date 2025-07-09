@@ -5,6 +5,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.registry.SWISSBlocks;
+import org.mangorage.swiss.registry.SWISSItems;
 
 public final class MSLangProvider extends LanguageProvider {
 
@@ -23,6 +24,8 @@ public final class MSLangProvider extends LanguageProvider {
         addBlock(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK, "Item Importer Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
+
+        addItem(SWISSItems.SWISS_CHEESE, "Swiss Cheese");
 
         //GUI
         addGUITranslation("settings_menu", "Open Settings Menu");
