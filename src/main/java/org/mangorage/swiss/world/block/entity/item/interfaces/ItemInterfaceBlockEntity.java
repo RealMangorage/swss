@@ -2,10 +2,16 @@ package org.mangorage.swiss.world.block.entity.item.interfaces;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
@@ -32,13 +38,24 @@ public final class ItemInterfaceBlockEntity extends BaseStorageBlockEntity imple
 
     @Override
     public IItemHandler getItemHandler() {
-        BlockPos outputPos = getBlockPos().relative(getBlockState().getValue(InterfaceNetworkBlock.FACING).getOpposite());
+        Direction facing = getBlockState().getValue(InterfaceNetworkBlock.FACING);
+        BlockPos outputPos = getBlockPos().relative(facing.getOpposite());
         BlockState outputState = level.getBlockState(outputPos);
         BlockEntity outputBE = level.getBlockEntity(outputPos);
 
         if (outputState.isAir()) return null;
 
-        return Capabilities.ItemHandler.BLOCK.getCapability(level, outputPos, outputState, outputBE, Direction.DOWN);
+        if (outputState.is(Blocks.ENDER_CHEST)) {
+            final var owner = getOwner();
+            if (owner != null) {
+                final var ownerPlayer = level.getServer().getPlayerList().getPlayer(owner);
+                if (ownerPlayer != null) {
+                    return new InvWrapper(ownerPlayer.getEnderChestInventory());
+                }
+            }
+        }
+
+        return Capabilities.ItemHandler.BLOCK.getCapability(level, outputPos, outputState, outputBE, facing);
     }
 
     @Override

@@ -76,38 +76,41 @@ public final class ItemHandlerLookup {
         this.handlers = handlers;
     }
 
+    public static List<IItemHandler> getItemHandlersForInsertNetwork(Network network) {
+        return network
+                .getItemDevices()
+                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
+                .map(ItemDevice::getItemHandler)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public static List<IItemHandler> getItemHandlersForExtractNetwork(Network network) {
+        return network
+                .getItemDevices()
+                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
+                .map(ItemDevice::getItemHandler)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     public static ItemHandlerLookup getLookupForExtract(Network network) {
-        return new ItemHandlerLookup(
-                network
-                        .getItemDevices()
-                        .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
-                        .map(ItemDevice::getItemHandler)
-                        .filter(Objects::nonNull)
-                        .toList()
-        );
+        return new ItemHandlerLookup(getItemHandlersForExtractNetwork(network));
     }
 
     public static ItemHandlerLookup getLookupForInsert(Network network) {
-        return new ItemHandlerLookup(
-                network
-                        .getItemDevices()
-                        .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canInsert(DeviceType.ITEM))
-                        .map(ItemDevice::getItemHandler)
-                        .filter(Objects::nonNull)
-                        .toList()
-        );
+        return new ItemHandlerLookup(getItemHandlersForInsertNetwork(network));
     }
 
     public ItemStack findAny(Item item, int amount) {
         amount = Math.min(amount, item.getDefaultMaxStackSize());
-        ItemStack lookForItem = item.getDefaultInstance();
 
         ItemStack collected = ItemStack.EMPTY;
         int remaining = amount;
 
         for (IItemHandler handler : handlers) {
             for (int slot = 0; slot < handler.getSlots(); slot++) {
-                if (!handler.isItemValid(slot, lookForItem)) continue;
+//                if (!handler.isItemValid(slot, lookForItem)) continue;
 
                 ItemStack simulated = handler.extractItem(slot, remaining, true);
                 if (!simulated.isEmpty() && simulated.getItem() == item) {

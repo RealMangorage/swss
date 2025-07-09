@@ -10,6 +10,9 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    maven {
+        url "https://cursemaven.com"
+    }
 }
 
 base {
@@ -116,6 +119,18 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    // Mods we can test against!
+
+    implementation "curse.maven:mekanism-268560:6486993" // Mekanism
+    implementation "curse.maven:storage-drawers-223852:6714200" // Storage Drawers
+    implementation "curse.maven:jei-238222:6614392" // JEI
+    implementation "curse.maven:create-328085:6641610" // Create
+    implementation "curse.maven:functional-storage-556861:6725023" // Functional Storage
+    implementation "curse.maven:titanium-287342:6443608" // Titanium for Function Storage
+    implementation "curse.maven:refined-storage-243076:6391989" // RS2
+
+
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

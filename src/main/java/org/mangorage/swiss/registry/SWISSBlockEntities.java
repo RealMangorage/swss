@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
@@ -22,6 +23,11 @@ public final class SWISSBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemExporterBlockEntity>> EXPORTER_ITEM_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("exporter_item_interface_block_entity", () -> BlockEntityType.Builder.of(
             ItemExporterBlockEntity::new,
             SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()
+    ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ItemImporterBlockEntity>> IMPORTER_ITEM_INTERFACE_BLOCK_ENTITY = BLOCK_ENTITIES.register("importer_item_interface_block_entity", () -> BlockEntityType.Builder.of(
+            ItemImporterBlockEntity::new,
+            SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get()
     ).build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StorageItemPanelBlockEntity>> STORAGE_ITEM_PANEL_BLOCK_ENTITY = BLOCK_ENTITIES.register("storage_item_panel_block_entity", () -> BlockEntityType.Builder.of(

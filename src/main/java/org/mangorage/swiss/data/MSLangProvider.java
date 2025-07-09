@@ -20,6 +20,7 @@ public final class MSLangProvider extends LanguageProvider {
 
         //Blocks
         addBlock(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK, "Item Exporter Interface");
+        addBlock(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK, "Item Importer Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
 

@@ -26,6 +26,11 @@ public final class SWISSItems {
             new Item.Properties()
     ));
 
+    public static final DeferredHolder<Item, BlockItem> IMPORTER_ITEM_INTERFACE_ITEM = ITEMS.register("importer_item_interface", () -> new BlockItem(
+            SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get(),
+            new Item.Properties()
+    ));
+
     public static final DeferredHolder<Item, Item> STORAGE_ITEM_PANEL_ITEM = ITEMS.register("storage_item_panel", () -> new BlockItem(
             SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get(),
             new Item.Properties()
@@ -48,10 +53,13 @@ public final class SWISSItems {
             .displayItems((p, o) -> {
                 o.accept(STORAGE_ITEM_INTERFACE_ITEM.get());
                 o.accept(EXPORTER_ITEM_INTERFACE_ITEM.get());
+                o.accept(IMPORTER_ITEM_INTERFACE_ITEM.get());
                 o.accept(STORAGE_ITEM_PANEL_ITEM.get());
-                o.accept(TEST_BLOCK_ITEM.get());
-                o.accept(SETTINGS.get());
 
+                if (p.hasPermissions()) {
+                    o.accept(TEST_BLOCK_ITEM.get());
+                    o.accept(SETTINGS.get());
+                }
             })
             .build()
     );

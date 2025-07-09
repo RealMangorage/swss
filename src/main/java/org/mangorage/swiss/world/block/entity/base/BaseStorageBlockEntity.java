@@ -29,9 +29,11 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         CompoundTag deviceDataTag = new CompoundTag();
-        deviceDataTag.putUUID("networkId", networkId);
-        if (owner != null)
+        if (owner != null) {
             deviceDataTag.putUUID("owner", owner);
+            if (networkId != null)
+                deviceDataTag.putUUID("networkId", networkId);
+        }
         tag.put("deviceData", deviceDataTag);
     }
 
@@ -41,7 +43,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         final var deviceDataTag = tag.getCompound("deviceData");
         if (deviceDataTag.contains("owner"))
             setOwner(deviceDataTag.getUUID("owner"));
-        this.networkId = deviceDataTag.getUUID("networkId");
+        this.networkId = deviceDataTag.contains("networkId") ? deviceDataTag.getUUID("networkId") : null;
     }
 
     @Override
@@ -90,8 +92,10 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
         connectToNetwork();
 
-        getNetwork()
-                .registerDevice(this);
+        if (network != null) {
+            getNetwork()
+                    .registerDevice(this);
+        }
     }
 
     @Override

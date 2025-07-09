@@ -10,6 +10,7 @@ import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 import org.mangorage.swiss.world.block.PanelNetworkBlock;
 import org.mangorage.swiss.world.block.TestBlock;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
@@ -27,6 +28,12 @@ public final class SWISSBlocks {
             BlockBehaviour.Properties.of()
                     .noOcclusion(),
             ItemExporterBlockEntity::new
+    ));
+
+    public static final DeferredHolder<Block, InterfaceNetworkBlock> IMPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("importer_item_interface", () -> new InterfaceNetworkBlock(
+            BlockBehaviour.Properties.of()
+                    .noOcclusion(),
+            ItemImporterBlockEntity::new
     ));
 
     public static final DeferredHolder<Block, Block> STORAGE_ITEM_PANEL_BLOCK = BLOCKS.register("storage_item_panel", () -> new PanelNetworkBlock(

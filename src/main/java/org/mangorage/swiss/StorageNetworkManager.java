@@ -122,7 +122,6 @@ public final class StorageNetworkManager extends SavedData {
         }
     }
 
-
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         final var data = new CompoundTag();

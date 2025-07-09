@@ -56,7 +56,7 @@ public abstract class AbstractBaseNetworkBlock extends Block implements EntityBl
         if (level.isClientSide()) return ItemInteractionResult.CONSUME;
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
-        if (blockEntity != null && blockEntity instanceof IRightClickable rightClickable) {
+        if (!stack.isEmpty() && blockEntity != null && blockEntity instanceof IRightClickable rightClickable) {
             rightClickable.onPlayerClick(stack, player);
             return ItemInteractionResult.SUCCESS;
         } else {
