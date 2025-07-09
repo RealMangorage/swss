@@ -7,9 +7,9 @@ import net.minecraft.data.recipes.RecipeProvider;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class MSRecipeProvider extends RecipeProvider {
+public final class SWISSRecipeProvider extends RecipeProvider {
 
-    public MSRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+    public SWISSRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
         super(output, completableFuture);
     }
     @Override

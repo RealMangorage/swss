@@ -1,6 +1,8 @@
 package org.mangorage.swiss.registry;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -19,26 +21,22 @@ public final class SWISSBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.createBlocks(SWISS.MODID);
 
     public static final DeferredHolder<Block, InterfaceNetworkBlock> STORAGE_ITEM_INTERFACE_BLOCK = BLOCKS.register("storage_item_interface", () -> new InterfaceNetworkBlock(
-            BlockBehaviour.Properties.of()
-                    .noOcclusion(),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
             ItemInterfaceBlockEntity::new
     ));
 
     public static final DeferredHolder<Block, InterfaceNetworkBlock> EXPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("exporter_item_interface", () -> new InterfaceNetworkBlock(
-            BlockBehaviour.Properties.of()
-                    .noOcclusion(),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
             ItemExporterBlockEntity::new
     ));
 
     public static final DeferredHolder<Block, InterfaceNetworkBlock> IMPORTER_ITEM_INTERFACE_BLOCK = BLOCKS.register("importer_item_interface", () -> new InterfaceNetworkBlock(
-            BlockBehaviour.Properties.of()
-                    .noOcclusion(),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
             ItemImporterBlockEntity::new
     ));
 
     public static final DeferredHolder<Block, Block> STORAGE_ITEM_PANEL_BLOCK = BLOCKS.register("storage_item_panel", () -> new PanelNetworkBlock(
-            BlockBehaviour.Properties.of()
-                    .noOcclusion(),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
             StorageItemPanelBlockEntity::new
     ));
 

@@ -4,11 +4,10 @@ import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.registry.SWISSBlocks;
 
-public final class MSBlockStatesProvider extends BlockStateProvider {
+public final class SWISSBlockStatesProvider extends BlockStateProvider {
 
-    public MSBlockStatesProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+    public SWISSBlockStatesProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, SWISS.MODID, existingFileHelper);
     }
 

@@ -10,9 +10,9 @@ import org.mangorage.swiss.registry.SWISSBlocks;
 
 import java.util.Set;
 
-public class MSLootTableProvider extends VanillaBlockLoot {
+public class SWISSLootTableProvider extends VanillaBlockLoot {
 
-    public MSLootTableProvider(HolderLookup.Provider p_344962_) {
+    public SWISSLootTableProvider(HolderLookup.Provider p_344962_) {
         super(p_344962_);
     }
     @Override
@@ -20,6 +20,8 @@ public class MSLootTableProvider extends VanillaBlockLoot {
 
         this.dropSelf(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
         this.dropSelf(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get());
+        this.dropSelf(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get());
+        this.dropSelf(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
 
     }
 

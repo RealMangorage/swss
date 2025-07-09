@@ -7,9 +7,9 @@ import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.registry.SWISSItems;
 
-public final class MSLangProvider extends LanguageProvider {
+public final class SWISSLangProvider extends LanguageProvider {
 
-    public MSLangProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+    public SWISSLangProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, SWISS.MODID, "en_us");
     }
 

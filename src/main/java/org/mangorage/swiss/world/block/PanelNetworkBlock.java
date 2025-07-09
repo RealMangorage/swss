@@ -68,7 +68,7 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
         Level level = context.getLevel();
         BlockPos blockPos = context.getClickedPos();
         BlockState blockState = context.getLevel().getBlockState(blockPos);
-        Direction direction = context.getNearestLookingDirection();
+        Direction direction = context.getClickedFace().getOpposite();
 
         if (blockState.is(Blocks.WATER)) {
             return this.defaultBlockState().setValue(WATERLOGGED, true).setValue(FACING, direction.getOpposite());

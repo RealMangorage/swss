@@ -24,22 +24,22 @@ public final class DataGenerators {
         DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        generator.addProvider(event.includeServer(), new MSRecipeProvider(packOutput, event.getLookupProvider()));
+        generator.addProvider(event.includeServer(), new SWISSRecipeProvider(packOutput, event.getLookupProvider()));
 
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(MSLootTableProvider::new, LootContextParamSets.BLOCK)), event.getLookupProvider()));
+                List.of(new LootTableProvider.SubProviderEntry(SWISSLootTableProvider::new, LootContextParamSets.BLOCK)), event.getLookupProvider()));
 
 
-        MSBlockTags blockTags = new MSBlockTags(packOutput, lookupProvider, event.getExistingFileHelper());
+        SWISSBlockTags blockTags = new SWISSBlockTags(packOutput, lookupProvider, event.getExistingFileHelper());
         generator.addProvider(event.includeServer(), blockTags);
 
-        MSItemTags itemTags = new MSItemTags(packOutput, lookupProvider, blockTags, event.getExistingFileHelper());
+        SWISSItemTags itemTags = new SWISSItemTags(packOutput, lookupProvider, blockTags, event.getExistingFileHelper());
         generator.addProvider(event.includeServer(), itemTags);
 
-        generator.addProvider(event.includeClient(), new MSItemModelProvider(packOutput, event.getExistingFileHelper()));
-        generator.addProvider(event.includeClient(), new MSBlockStatesProvider(packOutput, event.getExistingFileHelper()));
+        generator.addProvider(event.includeClient(), new SWISSItemModelProvider(packOutput, event.getExistingFileHelper()));
+        generator.addProvider(event.includeClient(), new SWISSBlockStatesProvider(packOutput, event.getExistingFileHelper()));
 
-        generator.addProvider(event.includeClient(), new MSLangProvider(packOutput, event.getExistingFileHelper()));
+        generator.addProvider(event.includeClient(), new SWISSLangProvider(packOutput, event.getExistingFileHelper()));
 
     }
 

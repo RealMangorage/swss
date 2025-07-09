@@ -6,9 +6,9 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.registry.SWISSItems;
 
-public final class MSItemModelProvider extends ItemModelProvider {
+public final class SWISSItemModelProvider extends ItemModelProvider {
 
-    public MSItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+    public SWISSItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, SWISS.MODID, existingFileHelper);
     }
 

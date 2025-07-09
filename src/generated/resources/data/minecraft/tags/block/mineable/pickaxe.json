@@ -1,0 +1,8 @@
+{
+  "values": [
+    "swiss:exporter_item_interface",
+    "swiss:storage_item_interface",
+    "swiss:importer_item_interface",
+    "swiss:storage_item_panel"
+  ]
+}
