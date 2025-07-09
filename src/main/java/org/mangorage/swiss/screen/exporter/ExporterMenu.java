@@ -1,8 +1,11 @@
 package org.mangorage.swiss.screen.exporter;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -12,7 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.setting.SettingsMenu;
+import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
@@ -20,7 +27,7 @@ import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockE
 
 import java.util.List;
 
-public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
+public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
     private BaseStorageBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
@@ -62,6 +69,18 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
         }
     }
 
+    @Override
+    public void clicked(ItemStack itemStack, CompoundTag extraData, ClickType clickType, int button) {
+        if (button == 1) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("gui.swiss.configure_block_network")), buf -> buf.writeBlockPos(blockPos)
+            );
+
+        }
+    }
+
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     // must assign a slot number to each of the slots used by the GUI.
     // For this container, we can see both the tile inventory's slots as well as the player inventory slots and the hotbar.
@@ -95,14 +114,14 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18  + 17, 84 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18  + 17, 142));
         }
     }
 
@@ -111,6 +130,11 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
         if (object instanceof ItemList(List<ItemStack> stacks)) {
             this.itemStacks = stacks;
         }
+    }
+
+    @Override
+    public void requested(ServerPlayer player) {
+
     }
 
     public record ItemList(List<ItemStack> stacks) {}

@@ -1,6 +1,7 @@
 package org.mangorage.swiss.screen.exporter;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -12,13 +13,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implements IUpdatable {
 
@@ -33,7 +32,10 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     private boolean isDraggingScrollbar = false;
     private int dragOffsetY = 0;
     int filterY = 20;
-    int upgradeY = 44;
+    int upgradeY = 49;
+
+    private int settingsButtonX = 0;
+    private int settingsButtonY = 2;
 
     private List<ItemStack> filterItems = new ArrayList<>();
     private List<ItemStack> upgradeItems = new ArrayList<>();
@@ -41,15 +43,17 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/import_export_gui.png");
-    static final ResourceLocation BLOCK_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_block.png");
+    static final ResourceLocation SETTINGS_BUTTON =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_settings.png");
 
     public ExporterScreen(ExporterMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.allItems = getAllItems();
-        this.filteredItems = new ArrayList<>(allItems);
-        this.imageHeight = 165 + 18 * 2;  // expand GUI height to fit two rows
-        this.imageWidth = 175;
+        this.filteredItems = new ArrayList<>(allItems != null ? allItems : List.of());
+        this.imageHeight = 165;
+        this.imageWidth = 209;
+        this.inventoryLabelX = 25;
+        this.titleLabelX = 25;
 
         while (filterItems.size() < 9) {
             filterItems.add(ItemStack.EMPTY);
@@ -59,12 +63,21 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
             upgradeItems.add(ItemStack.EMPTY);
         }
     }
+
     @Override
     public void update() {
         this.allItems = getAllItems();
-        this.filteredItems = new ArrayList<>(allItems);
-        this.menu.getBlockEntity().getExportItems() = new ArrayList<>(filteredItems);
+        this.filteredItems = new ArrayList<>(allItems != null ? allItems : List.of());
+
+        // Also sync filterItems from blockEntity as we discussed:
+        filterItems.clear();
+        filterItems.addAll(menu.getBlockEntity().getExportItems());
+
+        while (filterItems.size() < 9) {
+            filterItems.add(ItemStack.EMPTY);
+        }
     }
+
 
     public List<ItemStack> getAllItems() {
         return menu.itemStacks;
@@ -82,16 +95,18 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
         RenderSystem.setShaderTexture(0, TEXTURE);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET;
+        int scrollbarX = leftPos + SCROLLBAR_X_OFFSET + 17;
         int scrollbarY = topPos + SCROLLBAR_Y_OFFSET;
 
         int handleHeight = 15;
-        int maxScroll = Math.max(0, filteredItems.size() - ITEMS_PER_PAGE);
+        int maxScroll = Math.max(0, (filteredItems != null ? filteredItems.size() : 0) - ITEMS_PER_PAGE);
         if (maxScroll > 0) {
             float scrollPercent = scrollIndex / (float) maxScroll;
             int handleY = scrollbarY + (int) ((SCROLLBAR_HEIGHT - handleHeight) * scrollPercent);
             guiGraphics.blit(TEXTURE, scrollbarX, handleY, 176, 0, 12, 15);  // handle
         }
+        guiGraphics.blit(SETTINGS_BUTTON, leftPos, topPos + 2, 0, 0, 17, 17, 17, 17);
+
     }
 
 
@@ -105,7 +120,7 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
 
         // Render first row: filter items (9 across)
         for (int i = 0; i < filterItems.size(); i++) {
-            int x = startX + i * 18;
+            int x = startX + i * 18  + 17;
             int y = topPos + filterY;  // position near top, adjust as needed
 
             ItemStack filterStack = filterItems.get(i);
@@ -120,11 +135,12 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
                 guiGraphics.renderTooltip(font, filterStack, mouseX, mouseY);
             }
+            renderButtonTooltips(guiGraphics, mouseX, mouseY, leftPos, topPos);
         }
 
         // Render second row: upgrade items (9 across)
         for (int i = 0; i < upgradeItems.size(); i++) {
-            int x = startX + i * 18;
+            int x = startX + i * 18 + 17;
             int y = topPos + upgradeY;  // below the filter row, adjust as needed
 
             ItemStack upgradeStack = upgradeItems.get(i);
@@ -174,7 +190,7 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int startX = leftPos + 8;
+        int startX = leftPos + 25;
 
         // Get the item currently held on cursor
         ItemStack heldStack = this.getMenu().getCarried();  // "getCarried()" is AbstractContainerScreen method returning the stack under the mouse
@@ -185,22 +201,20 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
             if (mouseX >= x && mouseX < x + 16 && mouseY >= filterY + topPos && mouseY < filterY + 16 + topPos) {
                 // If player is holding an item, assign it to this filter slot
                 if (!heldStack.isEmpty()) {
-                    // Set a copy of heldStack with count 1 (filters usually only need one item)
                     ItemStack newFilter = heldStack.copy();
                     newFilter.setCount(1);
                     filterItems.set(i, newFilter);
                     selectedFilter = newFilter;
                     applyFilter(selectedFilter);
-
-                    // Also clear the carried item since we "placed" it in the filter
-                    //this.ser(ItemStack.EMPTY);
-
                 } else {
-                    // If no item held, maybe clear the filter on this slot
                     filterItems.set(i, ItemStack.EMPTY);
                     selectedFilter = ItemStack.EMPTY;
                     applyFilter(selectedFilter);
                 }
+
+                menu.getBlockEntity().getExportItems().clear();
+                menu.getBlockEntity().getExportItems().addAll(filterItems.stream().filter(stack -> !stack.isEmpty()).toList());
+
                 return true;
             }
         }
@@ -212,6 +226,12 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
                 onUpgradeClicked(i);
                 return true;
             }
+        }
+
+        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
+            Objects.requireNonNull(Minecraft.getInstance().getConnection()).send(
+                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Settings
+            );
         }
 
         if (super.mouseClicked(mouseX, mouseY, button)) return true;
@@ -258,5 +278,12 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+
+    private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
+
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.settings_menu"), mouseX, mouseY);
+        }
+    }
 
 }
