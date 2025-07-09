@@ -36,6 +36,22 @@ public abstract class AbstractBaseNetworkBlock extends Block implements EntityBl
         return function.apply(blockPos, blockState);
     }
 
+    boolean check(Level level, BlockPos pos) {
+        final var placedOn = pos.relative(level.getBlockState(pos).getValue(InterfaceNetworkBlock.FACING).getOpposite());
+        final var placedOnState = level.getBlockState(placedOn);
+
+        if (!placedOnState.isSolid()) {
+            return level.destroyBlock(pos, true);
+        }
+        return false;
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        check(level, pos);
+    }
+
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
@@ -44,6 +60,7 @@ public abstract class AbstractBaseNetworkBlock extends Block implements EntityBl
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
+        if (check(level, pos)) return;
         if (placer.getType() == EntityType.PLAYER) {
             final var be = level.getBlockEntity(pos);
             if (be instanceof IDevice device)

@@ -228,24 +228,6 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
 
-        if (createNetworkNameEditBox.isFocused()) {
-            if (createNetworkNameEditBox.keyPressed(keyCode, scanCode, modifiers) || createNetworkNameEditBox.canConsumeInput()) {
-                return true;
-            }
-        }
-
-        if (createNetworkPasswordEditBox.isFocused()) {
-            if (createNetworkPasswordEditBox.keyPressed(keyCode, scanCode, modifiers) || createNetworkPasswordEditBox.canConsumeInput()) {
-                return true;
-            }
-        }
-
-        if (joinNetworkPasswordEditBox.isFocused()) {
-            if (joinNetworkPasswordEditBox.keyPressed(keyCode, scanCode, modifiers) || joinNetworkPasswordEditBox.canConsumeInput()) {
-                return true;
-            }
-        }
-
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 

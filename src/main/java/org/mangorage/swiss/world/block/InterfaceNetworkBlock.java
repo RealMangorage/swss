@@ -1,6 +1,5 @@
 package org.mangorage.swiss.world.block;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -33,15 +32,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
-import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
 
@@ -129,6 +125,11 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE_MAP.get(state.getValue(FACING));
+    }
+
+    @Override
+    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos, int flags, int recursionLeft) {
+        super.updateIndirectNeighbourShapes(state, level, pos, flags, recursionLeft);
     }
 
     @Override

@@ -1,24 +1,29 @@
 {
     "variants": {
-        "facing=north": { "model": "swiss:block/item/storage_interface_on", "y": 0 },
-        "facing=east": { "model": "swiss:block/item/storage_interface_on", "y": 90 },
-        "facing=south": { "model": "swiss:block/item/storage_interface_on", "y": 180 },
-        "facing=west": { "model": "swiss:block/item/storage_interface_on", "y": 270 },
-        "facing=down": { "model": "swiss:block/item/storage_interface_on", "x": 90 },
-        "facing=up": { "model": "swiss:block/item/storage_interface_on", "x": 270 },
+        "facing=north,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "y": 0 },
+        "facing=north,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "y": 0 },
+        "facing=east,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "y": 90 },
+        "facing=east,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "y": 90 },
+        "facing=south,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "y": 180 },
+        "facing=south,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "y": 180 },
+        "facing=west,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "y": 270 },
+        "facing=west,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "y": 270 },
+        "facing=down,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "x": 90 },
+        "facing=down,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "x": 90 },
+        "facing=up,enabled=false,waterlogged=false": { "model": "swiss:block/item/storage_interface", "x": 270 },
+        "facing=up,enabled=false,waterlogged=true": { "model": "swiss:block/item/storage_interface", "x": 270 },
 
-        "enabled=false,facing=north": { "model": "swiss:block/item/storage_interface", "y": 0 },
-        "enabled=false,facing=east": { "model": "swiss:block/item/storage_interface", "y": 90 },
-        "enabled=false,facing=south": { "model": "swiss:block/item/storage_interface", "y": 180 },
-        "enabled=false,facing=west": { "model": "swiss:block/item/storage_interface", "y": 270 },
-        "enabled=false,facing=down": { "model": "swiss:block/item/storage_interface", "x": 90 },
-        "enabled=false,facing=up": { "model": "swiss:block/item/storage_interface", "x": 270 },
-
-        "enabled=true,facing=north": { "model": "swiss:block/item/storage_interface_on", "y": 0 },
-        "enabled=true,facing=east": { "model": "swiss:block/item/storage_interface_on", "y": 90 },
-        "enabled=true,facing=south": { "model": "swiss:block/item/storage_interface_on", "y": 180 },
-        "enabled=true,facing=west": { "model": "swiss:block/item/storage_interface_on", "y": 270 },
-        "enabled=true,facing=down": { "model": "swiss:block/item/storage_interface_on", "x": 90 },
-        "enabled=true,facing=up": { "model": "swiss:block/item/storage_interface_on", "x": 270 }
+        "facing=north,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "y": 0 },
+        "facing=north,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "y": 0 },
+        "facing=east,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "y": 90 },
+        "facing=east,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "y": 90 },
+        "facing=south,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "y": 180 },
+        "facing=south,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "y": 180 },
+        "facing=west,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "y": 270 },
+        "facing=west,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "y": 270 },
+        "facing=down,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "x": 90 },
+        "facing=down,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "x": 90 },
+        "facing=up,enabled=true,waterlogged=false": { "model": "swiss:block/item/storage_interface_on", "x": 270 },
+        "facing=up,enabled=true,waterlogged=true": { "model": "swiss:block/item/storage_interface_on", "x": 270 }
     }
 }
