@@ -189,7 +189,6 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
                     }
                 };
 
-                System.out.println(blockState.is(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get()));
                 if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get())) {
                     player.openMenu(new SimpleMenuProvider(
                                     (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, blockPos, data),
@@ -202,6 +201,23 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
                             }
                     );
                 }
+
+
+                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())) {
+                    player.openMenu(new SimpleMenuProvider(
+                                    (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                                    Component.translatable("block.swiss.exporter_item_interface")
+                            ),
+                            buf -> {
+                                buf.writeBlockPos(blockPos);
+                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                            }
+                    );
+                }
+
+
+
                 /*
 
                 if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get())) {

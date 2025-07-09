@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
@@ -19,6 +20,7 @@ import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
@@ -75,7 +77,11 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
             player.openMenu(
                     new SimpleMenuProvider(
                             (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
-                            Component.translatable("gui.swiss.configure_block_network")), buf -> buf.writeBlockPos(blockPos)
+                            Component.translatable("gui.swiss.configure_block_network")
+                    ), buf -> {
+                        buf.writeBlockPos(blockPos);
+                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player));
+                    }
             );
 
         }
