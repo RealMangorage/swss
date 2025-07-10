@@ -79,7 +79,7 @@ public final class ItemHandlerLookup {
     public static List<IItemHandler> getItemHandlersForInsertNetwork(Network network) {
         return network
                 .getItemDevices()
-                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canExtract(DeviceType.ITEM))
+                .filter(itemDevice -> itemDevice.isValidDevice() && itemDevice.canInsert(DeviceType.ITEM))
                 .map(ItemDevice::getItemHandler)
                 .filter(Objects::nonNull)
                 .toList();

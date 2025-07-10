@@ -8,14 +8,17 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkScreen;
 import org.mangorage.swiss.screen.exporter.ExporterScreen;
+import org.mangorage.swiss.screen.importer.ImporterScreen;
 import org.mangorage.swiss.screen.manager.ManagerScreen;
 import org.mangorage.swiss.screen.network.NetworkScreen;
 import org.mangorage.swiss.screen.setting.SettingsScreen;
@@ -82,11 +85,13 @@ public final class SWISS {
             event.register(MSMenuTypes.TEST_MENU.get(), TestScreen::new);
             event.register(MSMenuTypes.SETTINGS_MENU.get(), SettingsScreen::new);
             event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
+            event.register(MSMenuTypes.IMPORTER_MENU.get(), ImporterScreen::new);
             event.register(MSMenuTypes.NETWORK_MENU.get(), NetworkScreen::new);
             event.register(MSMenuTypes.MANAGER_MENU.get(), ManagerScreen::new);
             event.register(MSMenuTypes.CONFIGURE_BLOCK_NETWORK_MENU.get(), ConfigureBlockNetworkScreen::new);
 
         }
+
 
     }
 }

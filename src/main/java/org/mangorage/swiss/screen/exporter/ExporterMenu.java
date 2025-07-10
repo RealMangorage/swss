@@ -17,6 +17,7 @@ import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
+import org.mangorage.swiss.screen.FilterMenu;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.setting.SettingsMenu;
@@ -34,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
+public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact, FilterMenu {
 
     public ItemExporterBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
@@ -65,13 +66,11 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
 
         if (!level.isClientSide()) {
 
-            System.out.println("export items " + blockEntity.getExportItems());
-
             Map<Integer, ItemStack> filterMap = new HashMap<>();
             List<ItemStack> items = blockEntity.getExportItems();
             for (int i = 0; i < items.size(); i++) {
-                if (!filterItems.get(i).isEmpty()) {
-                    filterMap.put(i, filterItems.get(i));
+                if (!items.get(i).isEmpty()) {
+                    filterMap.put(i, items.get(i));
                 }
             }
 
@@ -165,6 +164,17 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     public void requested(ServerPlayer player) {
 
     }
+
+    @Override
+    public List<ItemStack> getFilterItems() {
+        return filterItems;
+    }
+
+    @Override
+    public void setFilterItems(List<ItemStack> items) {
+        this.filterItems = items;
+    }
+
 
     public record ItemList(List<ItemStack> stacks) {}
 }

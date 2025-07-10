@@ -7,9 +7,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.mangorage.swiss.SWISS;
@@ -17,7 +15,6 @@ import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncFilterItemsPacketC2S;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
-import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 
 import java.util.*;
 
@@ -91,13 +88,8 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     protected void init() {
         super.init();
 
-
         this.filterItems = getMenu().blockEntity.getExportItems();
-        System.out.println("ExporterBlock initialized with filter items: " + getMenu().blockEntity.getExportItems());
 
-        System.out.println("ExporterScreen initialized with filter items: " + filterItems);
-
-        // Pad filterItems to size 9 with EMPTY stacks if necessary
         while (filterItems.size() < 9) {
             filterItems.add(ItemStack.EMPTY);
         }

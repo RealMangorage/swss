@@ -39,8 +39,6 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
         ticks++;
         if (ticks % 20 == 0) {
 
-            System.out.println(exportItems);
-
             connectToNetwork();
 
             IItemHandler output = getOutput();
@@ -85,7 +83,6 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        System.out.println("Saving exportItems: " + exportItems);
         super.saveAdditional(tag, registries);
         DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, registries);
         tag.put("exportItems", ItemStack.OPTIONAL_CODEC.listOf()
@@ -95,7 +92,6 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        System.out.println("Loading exportItems from tag: " + tag.get("exportItems"));
         super.loadAdditional(tag, registries);
         DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, registries);
 

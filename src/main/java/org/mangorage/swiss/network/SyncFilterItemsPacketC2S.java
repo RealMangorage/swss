@@ -20,6 +20,7 @@ import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,26 +39,25 @@ public record SyncFilterItemsPacketC2S(Map<Integer, ItemStack> stackBySlot, Bloc
         if (blockEntity instanceof ItemExporterBlockEntity itemExporter) {
             itemExporter.exportItems.clear();
 
-            // If pkt.stackBySlot() is Map<Integer, ItemStack>
             Map<Integer, ItemStack> newItems = pkt.stackBySlot();
-
-            // Assuming exportItems is a List<ItemStack>, we must add in the correct order
-            // Let's create a list sized to the max key + 1 and fill with empty stacks if needed
             int maxSlot = newItems.keySet().stream().max(Integer::compareTo).orElse(-1);
-
-            // Clear and resize exportItems with empty stacks up to maxSlot
             while (itemExporter.exportItems.size() <= maxSlot) {
                 itemExporter.exportItems.add(ItemStack.EMPTY);
             }
-
-            // Now put the ItemStacks at correct positions
-            newItems.forEach((slot, stack) -> {
-                itemExporter.exportItems.set(slot, stack);
-            });
-
+            newItems.forEach(itemExporter.exportItems::set);
             itemExporter.setChanged();
+        }
 
-            System.out.println("packet " + itemExporter.exportItems);
+        if (blockEntity instanceof ItemImporterBlockEntity itemExporter) {
+            itemExporter.importItems.clear();
+
+            Map<Integer, ItemStack> newItems = pkt.stackBySlot();
+            int maxSlot = newItems.keySet().stream().max(Integer::compareTo).orElse(-1);
+            while (itemExporter.importItems.size() <= maxSlot) {
+                itemExporter.importItems.add(ItemStack.EMPTY);
+            }
+            newItems.forEach(itemExporter.importItems::set);
+            itemExporter.setChanged();
         }
     };
 

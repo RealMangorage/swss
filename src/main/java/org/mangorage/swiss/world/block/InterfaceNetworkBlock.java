@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
@@ -35,7 +34,7 @@ import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.exporter.ExporterMenu;
-import org.mangorage.swiss.screen.exporter.ExporterScreen;
+import org.mangorage.swiss.screen.importer.ImporterMenu;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 
@@ -202,8 +201,21 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
                     );
                 }
 
+                else if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get())) {
+                    player.openMenu(new SimpleMenuProvider(
+                                    (windowId, playerInventory, playerEntity) -> new ImporterMenu(windowId, playerInventory, blockPos, data),
+                                    Component.translatable("block.swiss.importer_item_interface")
+                            ),
+                            buf -> {
+                                buf.writeBlockPos(blockPos);
+                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                            }
+                    );
+                }
 
-                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()) || storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK)) {
+
+                else if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()) || storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK)) {
                     player.openMenu(new SimpleMenuProvider(
                                     (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
                                     Component.translatable("block.swiss.exporter_item_interface")

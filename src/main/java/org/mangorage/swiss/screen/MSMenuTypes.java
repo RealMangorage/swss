@@ -7,8 +7,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkScreen;
 import org.mangorage.swiss.screen.exporter.ExporterMenu;
+import org.mangorage.swiss.screen.importer.ImporterMenu;
 import org.mangorage.swiss.screen.manager.ManagerMenu;
 import org.mangorage.swiss.screen.network.NetworkMenu;
 import org.mangorage.swiss.screen.setting.SettingsMenu;
@@ -24,6 +24,7 @@ public final class MSMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<TestMenu>> TEST_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<SettingsMenu>> SETTINGS_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<ExporterMenu>> EXPORTER_MENU;
+    public static final DeferredHolder<MenuType<?>, MenuType<ImporterMenu>> IMPORTER_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<NetworkMenu>> NETWORK_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<ManagerMenu>> MANAGER_MENU;
     public static final DeferredHolder<MenuType<?>, MenuType<ConfigureBlockNetworkMenu>> CONFIGURE_BLOCK_NETWORK_MENU;
@@ -33,6 +34,7 @@ public final class MSMenuTypes {
         TEST_MENU = MENUS.register("test_menu", () -> IMenuTypeExtension.create(TestMenu::new));
         SETTINGS_MENU = MENUS.register("settings_menu", () -> IMenuTypeExtension.create(SettingsMenu::new));
         EXPORTER_MENU = MENUS.register("exporter_menu", () -> IMenuTypeExtension.create(ExporterMenu::new));
+        IMPORTER_MENU = MENUS.register("importer_menu", () -> IMenuTypeExtension.create(ImporterMenu::new));
         NETWORK_MENU = MENUS.register("network_menu", () -> IMenuTypeExtension.create(NetworkMenu::new));
         MANAGER_MENU = MENUS.register("manager_menu", () -> IMenuTypeExtension.create(ManagerMenu::new));
         CONFIGURE_BLOCK_NETWORK_MENU = MENUS.register("configure_block_network_menu", () -> IMenuTypeExtension.create(ConfigureBlockNetworkMenu::new));

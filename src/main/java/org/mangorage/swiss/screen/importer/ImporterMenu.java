@@ -1,14 +1,45 @@
 package org.mangorage.swiss.screen.importer;
 
-/*
-public final class ImporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
+import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
+import org.mangorage.swiss.registry.SWISSBlocks;
+import org.mangorage.swiss.screen.FilterMenu;
+import org.mangorage.swiss.screen.MSMenuTypes;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.util.Interact;
+import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
+import org.mangorage.swiss.storage.network.NetworkInfo;
+import org.mangorage.swiss.storage.util.IPacketRequest;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
 
-    private StorageItemPanelBlockEntity blockEntity;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class ImporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact, FilterMenu {
+
+    public ItemImporterBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
-    private Level level;
+    public Level level;
     private ContainerData data;
-    private Player player;
+    public Player player;
     private BlockPos blockPos;
+    public List<ItemStack> filterItems = new ArrayList<>();
+
 
     public ImporterMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
@@ -16,26 +47,64 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
     }
 
     public ImporterMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
-        super(MSMenuTypes.EXPORTER_MENU.get(), containerID);
+        super(MSMenuTypes.IMPORTER_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
-        this.blockEntity = (StorageItemPanelBlockEntity) this.level.getBlockEntity(blockPos);
+        this.blockEntity = (ItemImporterBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
 
         addDataSlots(data);
+
+        //if (!level.isClientSide()) {
+
+            Map<Integer, ItemStack> filterMap = new HashMap<>();
+            List<ItemStack> items = blockEntity.getImportItems();
+
+            System.out.println("item "+  items);
+
+            for (int i = 0; i < items.size(); i++) {
+                if (!items.get(i).isEmpty()) {
+                    filterMap.put(i, items.get(i));
+                }
+            }
+
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFilterItemsPacketS2C(filterMap, blockPos));
+        //}
+
+    }
+
+
+    public ItemImporterBlockEntity getBlockEntity() {
+        return (ItemImporterBlockEntity) blockEntity;
     }
 
     @Override
     public void sendAllDataToRemote() {
         super.sendAllDataToRemote();
         if (!level.isClientSide()) {
-            final var items = blockEntity.getItems();
-            final var sp = (ServerPlayer) player;
-            sp.connection.send(new SyncNetworkItemsPacketS2C(items));
+            //final var items = blockEntity.getItems();
+            //final var sp = (ServerPlayer) player;
+            //sp.connection.send(new SyncNetworkItemsPacketS2C(items));
+        }
+    }
+
+    @Override
+    public void clicked(ItemStack itemStack, CompoundTag extraData, ClickType clickType, int button) {
+        if (button == 1) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("gui.swiss.configure_block_network")
+                    ), buf -> {
+                        buf.writeBlockPos(blockPos);
+                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player));
+                    }
+            );
+
         }
     }
 
@@ -59,55 +128,27 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        Slot sourceSlot = slots.get(index);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
-        ItemStack sourceStack = sourceSlot.getItem();
-        ItemStack copyOfSourceStack = sourceStack.copy();
-
-        // Check if the slot clicked is one of the vanilla container slots
-        if (index < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-            // This is a vanilla container slot so merge the stack into the tile inventory
-            if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX
-                    + TE_INVENTORY_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;  // EMPTY_ITEM
-            }
-        } else if (index < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
-            // This is a TE slot so merge the stack into the players inventory
-            if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else {
-            System.out.println("Invalid slotIndex:" + index);
-            return ItemStack.EMPTY;
-        }
-        // If stack size == 0 (the entire stack was moved) set slot contents to null
-        if (sourceStack.getCount() == 0) {
-            sourceSlot.set(ItemStack.EMPTY);
-        } else {
-            sourceSlot.setChanged();
-        }
-        sourceSlot.onTake(playerIn, sourceStack);
-        return copyOfSourceStack;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public boolean stillValid(@NotNull Player player) {
         return stillValid(ContainerLevelAccess.create(player.level(), blockPos),
-                player, MSBlocks.INPORTER_ITEM_INTERFACE_BLOCK.get());
+                player, SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get());
     }
 
 
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18  + 17, 84 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18  + 17, 142));
         }
     }
 
@@ -118,8 +159,20 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
         }
     }
 
+    @Override
+    public void requested(ServerPlayer player) {
+
+    }
+
+    @Override
+    public List<ItemStack> getFilterItems() {
+        return filterItems;
+    }
+
+    @Override
+    public void setFilterItems(List<ItemStack> items) {
+        this.filterItems = items;
+    }
+
     public record ItemList(List<ItemStack> stacks) {}
 }
-
-
- */
