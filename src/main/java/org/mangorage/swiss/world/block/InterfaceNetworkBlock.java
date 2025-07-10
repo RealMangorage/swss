@@ -203,7 +203,7 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
                 }
 
 
-                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())) {
+                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()) || storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK)) {
                     player.openMenu(new SimpleMenuProvider(
                                     (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
                                     Component.translatable("block.swiss.exporter_item_interface")
