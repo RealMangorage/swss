@@ -10,6 +10,9 @@ public final class Packets {
                 .playToServer(RequestNetworkItemsPacketC2S.TYPE, RequestNetworkItemsPacketC2S.STREAM_CODEC, RequestNetworkItemsPacketC2S.HANDLER)
                 .playToServer(MenuInteractPacketC2S.TYPE, MenuInteractPacketC2S.STREAM_CODEC, MenuInteractPacketC2S.HANDLER)
                 .playToServer(CreateNetworkPacketC2S.TYPE, CreateNetworkPacketC2S.STREAM_CODEC, CreateNetworkPacketC2S.HANDLER)
-                .playToServer(JoinNetworkPacketC2S.TYPE, JoinNetworkPacketC2S.STREAM_CODEC, JoinNetworkPacketC2S.HANDLER);
+                .playToServer(JoinNetworkPacketC2S.TYPE, JoinNetworkPacketC2S.STREAM_CODEC, JoinNetworkPacketC2S.HANDLER)
+                .playToServer(SyncFilterItemsPacketC2S.TYPE, SyncFilterItemsPacketC2S.STREAM_CODEC, SyncFilterItemsPacketC2S.HANDLER)
+                .playToServer(SyncFilterItemsPacketS2C.TYPE, SyncFilterItemsPacketS2C.STREAM_CODEC, SyncFilterItemsPacketS2C.HANDLER);
+
     }
 }

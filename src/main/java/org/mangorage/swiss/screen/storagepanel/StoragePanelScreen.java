@@ -36,7 +36,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
     private static final int COLUMNS = 9;
     public static int visibleRows = 3;
-    private int itemsPerPage = visibleRows * COLUMNS;
+    private int itemsPerPage;
 
     private static final int SCROLLBAR_WIDTH = 12;
     private static final int SCROLLBAR_X_OFFSET = 174; // adjust to fit GUI width

@@ -1,7 +1,13 @@
 package org.mangorage.swiss.world.block.entity.item.interfaces;
 
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,6 +38,9 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
     public void tickServer() {
         ticks++;
         if (ticks % 20 == 0) {
+
+            System.out.println(exportItems);
+
             connectToNetwork();
 
             IItemHandler output = getOutput();
@@ -73,4 +82,35 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
     public void onPlayerClick(ItemStack stack, Player player) {
         //exportItem = stack.getItem();
     }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        System.out.println("Saving exportItems: " + exportItems);
+        super.saveAdditional(tag, registries);
+        DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, registries);
+        tag.put("exportItems", ItemStack.OPTIONAL_CODEC.listOf()
+                .encodeStart(ops, exportItems)
+                .getOrThrow());
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        System.out.println("Loading exportItems from tag: " + tag.get("exportItems"));
+        super.loadAdditional(tag, registries);
+        DynamicOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, registries);
+
+        if (tag.contains("exportItems", Tag.TAG_LIST)) {
+            ItemStack.CODEC.listOf()
+                    .parse(ops, tag.get("exportItems"))
+                    .resultOrPartial(error -> {
+                        System.err.println("Failed to load exportItems: " + error);
+                    })
+                    .ifPresent(list -> {
+                        exportItems.clear();
+                        exportItems.addAll(list);
+                        System.out.println("Loaded exportItems: " + exportItems);
+                    });
+        }
+    }
+
 }

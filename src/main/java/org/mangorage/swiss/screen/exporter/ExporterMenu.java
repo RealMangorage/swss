@@ -11,8 +11,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
@@ -27,16 +29,21 @@ import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
-    private BaseStorageBlockEntity blockEntity;
+    public ItemExporterBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
-    private Level level;
+    public Level level;
     private ContainerData data;
-    private Player player;
+    public Player player;
     private BlockPos blockPos;
+    public List<ItemStack> filterItems = new ArrayList<>();
+
 
     public ExporterMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
@@ -49,12 +56,28 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.data = data;
-        this.blockEntity = (BaseStorageBlockEntity) this.level.getBlockEntity(blockPos);
+        this.blockEntity = (ItemExporterBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
 
         addDataSlots(data);
+
+        if (!level.isClientSide()) {
+
+            System.out.println("export items " + blockEntity.getExportItems());
+
+            Map<Integer, ItemStack> filterMap = new HashMap<>();
+            List<ItemStack> items = blockEntity.getExportItems();
+            for (int i = 0; i < items.size(); i++) {
+                if (!filterItems.get(i).isEmpty()) {
+                    filterMap.put(i, filterItems.get(i));
+                }
+            }
+
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFilterItemsPacketS2C(filterMap, blockPos));
+        }
+
     }
 
     public ItemExporterBlockEntity getBlockEntity() {
