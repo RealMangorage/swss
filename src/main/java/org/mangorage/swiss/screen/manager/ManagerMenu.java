@@ -5,8 +5,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -20,27 +18,23 @@ import java.util.List;
 public final class ManagerMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
 
     private Level level;
-    private ContainerData data;
     private Player player;
     private BlockPos blockPos;
     protected List<NetworkInfo> networkInfo = List.of();
 
     public ManagerMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
+        this(containerID, inventory, extraData.readBlockPos());
         this.networkInfo = NetworkInfo.LIST_STREAM_CODEC.decode(extraData);
     }
 
-    public ManagerMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public ManagerMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.MANAGER_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.exporter.ExporterMenu;
 import org.mangorage.swiss.screen.importer.ImporterMenu;
+import org.mangorage.swiss.screen.util.HasMenu;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 
@@ -162,95 +163,5 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
 
     public @NotNull FluidState getFluidState(BlockState blockState) {
         return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
-    }
-
-    @Override
-    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
-        if (!level.isClientSide()) {
-
-            BaseStorageBlockEntity storageItemPanelBlockEntity = (BaseStorageBlockEntity) level.getBlockEntity(blockPos);
-            //MENU OPEN//
-            if (storageItemPanelBlockEntity instanceof BaseStorageBlockEntity) {
-                ContainerData data = new ContainerData() {
-                    @Override
-                    public int get(int index) {
-                        return 0;
-                    }
-
-                    @Override
-                    public void set(int index, int value) {
-
-                    }
-
-                    @Override
-                    public int getCount() {
-                        return 0;
-                    }
-                };
-
-                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get())) {
-                    player.openMenu(new SimpleMenuProvider(
-                                    (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, blockPos, data),
-                                    Component.translatable("block.swiss.exporter_item_interface")
-                            ),
-                            buf -> {
-                                buf.writeBlockPos(blockPos);
-                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
-                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
-                            }
-                    );
-                }
-
-                else if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get())) {
-                    player.openMenu(new SimpleMenuProvider(
-                                    (windowId, playerInventory, playerEntity) -> new ImporterMenu(windowId, playerInventory, blockPos, data),
-                                    Component.translatable("block.swiss.importer_item_interface")
-                            ),
-                            buf -> {
-                                buf.writeBlockPos(blockPos);
-                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
-                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
-                            }
-                    );
-                }
-
-
-                else if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get()) || storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK)) {
-                    player.openMenu(new SimpleMenuProvider(
-                                    (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
-                                    Component.translatable("block.swiss.exporter_item_interface")
-                            ),
-                            buf -> {
-                                buf.writeBlockPos(blockPos);
-                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
-                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
-                            }
-                    );
-                }
-
-
-
-                /*
-
-                if (storageItemPanelBlockEntity.getBlockState().is(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get())) {
-                    player.openMenu(new SimpleMenuProvider(
-                                    (windowId, playerInventory, playerEntity) -> new ImporterMenu(windowId, playerInventory, blockPos, data),
-                                    Component.translatable("block.swiss.exporter_item_interface")
-                            ),
-                            buf -> {
-                                buf.writeBlockPos(blockPos);
-                                final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
-                                NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
-                            }
-                    );
-                }
-
-                 */
-
-
-            }
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.FAIL;
     }
 }

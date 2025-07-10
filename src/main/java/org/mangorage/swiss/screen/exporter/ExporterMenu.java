@@ -11,72 +11,43 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
-import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
-import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
-import org.mangorage.swiss.screen.FilterMenu;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IPacketRequest;
-import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
-import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
-import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact, FilterMenu {
+public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
     public ItemExporterBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
     public Level level;
-    private ContainerData data;
     public Player player;
     private BlockPos blockPos;
     public List<ItemStack> filterItems = new ArrayList<>();
 
 
     public ExporterMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
+        this(containerID, inventory, extraData.readBlockPos());
 
     }
 
-    public ExporterMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public ExporterMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.EXPORTER_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
         this.blockEntity = (ItemExporterBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
-
-        if (!level.isClientSide()) {
-
-            Map<Integer, ItemStack> filterMap = new HashMap<>();
-            List<ItemStack> items = blockEntity.getExportItems();
-            for (int i = 0; i < items.size(); i++) {
-                if (!items.get(i).isEmpty()) {
-                    filterMap.put(i, items.get(i));
-                }
-            }
-
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFilterItemsPacketS2C(filterMap, blockPos));
-        }
-
     }
 
     public ItemExporterBlockEntity getBlockEntity() {
@@ -98,7 +69,7 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
         if (button == 1) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.configure_block_network")
                     ), buf -> {
                         buf.writeBlockPos(blockPos);
@@ -164,17 +135,6 @@ public final class ExporterMenu extends AbstractContainerMenu implements ISyncab
     public void requested(ServerPlayer player) {
 
     }
-
-    @Override
-    public List<ItemStack> getFilterItems() {
-        return filterItems;
-    }
-
-    @Override
-    public void setFilterItems(List<ItemStack> items) {
-        this.filterItems = items;
-    }
-
 
     public record ItemList(List<ItemStack> stacks) {}
 }

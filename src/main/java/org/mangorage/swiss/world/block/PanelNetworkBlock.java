@@ -91,21 +91,4 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
     public @NotNull FluidState getFluidState(BlockState blockState) {
         return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
     }
-
-    @Override
-    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
-        if (!level.isClientSide()) {
-
-            StorageItemPanelBlockEntity storageItemPanelBlockEntity = (StorageItemPanelBlockEntity) level.getBlockEntity(blockPos);
-            //MENU OPEN//
-            if (storageItemPanelBlockEntity instanceof StorageItemPanelBlockEntity) {
-                ContainerData data = storageItemPanelBlockEntity.data;
-                player.openMenu(new SimpleMenuProvider(
-                        (windowId, playerInventory, playerEntity) -> new StoragePanelMenu(windowId, playerInventory, blockPos, data),
-                        Component.literal("Item Crafting Panel")), (buf -> buf.writeBlockPos(blockPos)));
-            }
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.FAIL;
-    }
 }

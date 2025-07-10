@@ -17,6 +17,7 @@ import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.world.block.InterfaceNetworkBlock;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
     private UUID networkId = null;
     private UUID owner = null;
-    private Network network = null;
+    private Network network = UnknownNetwork.INSTANCE;
 
     public BaseStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
@@ -38,7 +39,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
 
     @Override
     public void handleUpdateTag(@NotNull CompoundTag compoundTag, HolderLookup.@NotNull Provider provider) {
-        super.loadAdditional(compoundTag, provider);
+        loadAdditional(compoundTag, provider);
     }
 
     @Override
@@ -48,11 +49,6 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
         return compoundTag;
     }
 
-    @Override
-    public void onDataPacket(@NotNull Connection connection, @NotNull ClientboundBlockEntityDataPacket clientboundBlockEntityDataPacket,
-                             HolderLookup.@NotNull Provider provider) {
-        super.onDataPacket(connection, clientboundBlockEntityDataPacket, provider);
-    }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -93,15 +89,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
     }
 
     protected void connectToNetwork() {
-        if (owner == null || network != null) return;
-        this.network = StorageNetworkManager.getInstance().getNetwork(level.getServer(), getNetworkId());
-
-        getNetwork().registerDevice(this);
-
-        // TODO: FIX so it properly reflects connection state
-        if (getBlockState().hasProperty(InterfaceNetworkBlock.CONNECTED)) {
-            getLevel().setBlock(getBlockPos(), getBlockState().setValue(InterfaceNetworkBlock.CONNECTED, true), Block.UPDATE_ALL);
-        }
+        if (owner == null || network != UnknownNetwork.INSTANCE) return;
+        setNetwork(getNetworkId());
     }
 
     public Network getNetwork() {
@@ -115,15 +104,17 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements IDev
                     .unregisterDevice(this);
         }
 
-        network = null;
+        network = UnknownNetwork.INSTANCE;
 
         networkId = id;
 
-        connectToNetwork();
+        network = StorageNetworkManager.getInstance().getNetwork(getLevel().getServer(), getNetworkId());
 
-        if (network != null) {
-            getNetwork()
-                    .registerDevice(this);
+        getNetwork()
+                .registerDevice(this);
+
+        if (getBlockState().hasProperty(InterfaceNetworkBlock.CONNECTED)) {
+            getLevel().setBlock(getBlockPos(), getBlockState().setValue(InterfaceNetworkBlock.CONNECTED, getNetwork() != UnknownNetwork.INSTANCE), Block.UPDATE_ALL);
         }
     }
 

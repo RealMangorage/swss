@@ -28,12 +28,11 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
 
     List<ItemStack> itemStacks = List.of();
     private Level level;
-    private ContainerData data;
     private Player player;
     private final BlockPos blockPos;
 
     public SettingsMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
+        this(containerID, inventory, extraData.readBlockPos());
     }
 
     public BlockPos getBlockPos() {
@@ -43,17 +42,14 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
         return level;
     }
 
-    public SettingsMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public SettingsMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.SETTINGS_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
     }
 
     @Override
@@ -129,7 +125,7 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
         if (button == 1) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new NetworkMenu(windowId, playerInventory, blockPos, data),
+                            (windowId, playerInventory, playerEntity) -> new NetworkMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.network_menu_title")
                     ),
                     buf -> {
@@ -142,7 +138,7 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
         if (button == 2) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new ManagerMenu(windowId, playerInventory, blockPos, data),
+                            (windowId, playerInventory, playerEntity) -> new ManagerMenu(windowId, playerInventory, blockPos),
                             Component.literal("")
                     ),
                     buf -> {
@@ -156,7 +152,7 @@ public final class SettingsMenu extends AbstractContainerMenu implements ISyncab
         if (button == 3) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos, data),
+                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.configure_block_network")
                     ),
                     buf -> {

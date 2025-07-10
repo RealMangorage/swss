@@ -26,11 +26,10 @@ public class SettingsItems extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
 
         BlockPos blockPos = player.blockPosition();
-        ContainerData data = new SimpleContainerData(1);
 
         player.openMenu(
                 new SimpleMenuProvider(
-                        (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos, data),
+                        (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos),
                         Component.literal("TEST")
                 ),
                 buf -> {

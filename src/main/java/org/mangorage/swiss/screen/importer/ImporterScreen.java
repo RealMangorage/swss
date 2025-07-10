@@ -13,7 +13,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncFilterItemsPacketC2S;
-import org.mangorage.swiss.network.SyncFilterItemsPacketS2C;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 

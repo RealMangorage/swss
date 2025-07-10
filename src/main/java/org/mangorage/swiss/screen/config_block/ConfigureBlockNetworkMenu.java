@@ -24,30 +24,26 @@ import java.util.List;
 public final class ConfigureBlockNetworkMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, Interact {
 
     private Level level;
-    private ContainerData data;
     private Player player;
     private BlockPos blockPos;
     protected List<NetworkInfo> networkInfo = List.of();
     private INetworkHolder networkHolder;
 
     public ConfigureBlockNetworkMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
+        this(containerID, inventory, extraData.readBlockPos());
         this.networkInfo = NetworkInfo.LIST_STREAM_CODEC.decode(extraData);
     }
 
-    public ConfigureBlockNetworkMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public ConfigureBlockNetworkMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.CONFIGURE_BLOCK_NETWORK_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
 
         this.networkHolder = level.getBlockEntity(blockPos) instanceof INetworkHolder holder ? holder : null;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
     }
 
     @Override

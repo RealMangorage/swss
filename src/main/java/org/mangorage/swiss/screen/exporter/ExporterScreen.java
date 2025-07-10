@@ -67,7 +67,6 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     }
 
     public void syncFilterItems() {
-
         Map<Integer, ItemStack> filterItemsMap = new HashMap<>();
         for (int i = 0; i < filterItems.size(); i++) {
             ItemStack stack = filterItems.get(i);

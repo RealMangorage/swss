@@ -22,16 +22,15 @@ public final class NetworkMenu extends AbstractContainerMenu implements ISyncabl
     private BlockPos blockPos;
 
     public NetworkMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
+        this(containerID, inventory, extraData.readBlockPos());
 
     }
 
-    public NetworkMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public NetworkMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.NETWORK_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);

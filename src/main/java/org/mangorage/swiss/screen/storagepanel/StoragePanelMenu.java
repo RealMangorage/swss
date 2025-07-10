@@ -1,6 +1,5 @@
 package org.mangorage.swiss.screen.storagepanel;
 
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,9 +25,6 @@ import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
-import org.mangorage.swiss.util.MouseUtil;
-import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,30 +35,24 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     private INetworkHolder networkHolder;
     List<ItemStack> itemStacks = List.of();
     private Level level;
-    private ContainerData data;
     private Player player;
     private BlockPos blockPos;
 
     public StoragePanelMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
-        this(containerID, inventory, extraData.readBlockPos(), new SimpleContainerData(1));
-
+        this(containerID, inventory, extraData.readBlockPos());
     }
 
 
 
-    public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos, ContainerData data) {
+    public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.STORAGE_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.data = data;
         this.networkHolder = level.getBlockEntity(blockPos) instanceof INetworkHolder holder ? holder : null;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
-
     }
 
     List<ItemStack> getNetworkItems() {
@@ -208,7 +198,7 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         if (button == 1) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos, data),
+                            (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.settings_menu")), buf -> buf.writeBlockPos(blockPos)
             );
 

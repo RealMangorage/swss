@@ -7,7 +7,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +19,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.registry.SWISSBlocks;
+import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.exporter.ExporterMenu;
+import org.mangorage.swiss.screen.importer.ImporterMenu;
+import org.mangorage.swiss.screen.util.HasMenu;
+import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IRightClickable;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
@@ -26,7 +36,7 @@ import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable {
+public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable, HasMenu {
     private int ticks = 0;
     public final List<ItemStack> exportItems = new ArrayList<>();
 
@@ -48,7 +58,7 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
                     if (ItemHandlerLookup.hasRoom(output, exportStack)) {
 
                         final var lookup = ItemHandlerLookup.getLookupForExtract(getNetwork());
-                        final var result = lookup.findAny(exportStack.getItem(), exportStack.getCount());
+                        final var result = lookup.findAny(exportStack.getItem(), Math.min(exportStack.getMaxStackSize(), 8));
 
                         if (!result.isEmpty()) {
                             final var remainder = ItemHandlerLookup.insertIntoHandlers(List.of(output), result);
@@ -104,9 +114,22 @@ public final class ItemExporterBlockEntity extends BaseStorageBlockEntity implem
                     .ifPresent(list -> {
                         exportItems.clear();
                         exportItems.addAll(list);
-                        System.out.println("Loaded exportItems: " + exportItems);
                     });
         }
     }
 
+    @Override
+    public void openMenu(Player player) {
+        player.openMenu(new SimpleMenuProvider(
+                        (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, getBlockPos()),
+                        Component.translatable("block.swiss.exporter_item_interface")
+                ),
+                buf -> {
+                    buf.writeBlockPos(getBlockPos());
+                    final var info = StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player);
+                    NetworkInfo.LIST_STREAM_CODEC.encode(buf, info);
+                }
+        );
+
+    }
 }

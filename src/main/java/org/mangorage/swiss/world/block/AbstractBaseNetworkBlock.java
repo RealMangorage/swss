@@ -2,6 +2,7 @@ package org.mangorage.swiss.world.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,7 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mangorage.swiss.screen.util.HasMenu;
 import org.mangorage.swiss.storage.device.IDevice;
 import org.mangorage.swiss.storage.util.IRightClickable;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
@@ -93,5 +96,18 @@ public abstract class AbstractBaseNetworkBlock extends Block implements EntityBl
                 }
             }
         };
+    }
+
+    @Override
+    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState blockState, Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull BlockHitResult hit) {
+        if (!level.isClientSide()) {
+
+            if (level.getBlockEntity(blockPos) instanceof HasMenu hasMenu) {
+                hasMenu.openMenu(player);
+            }
+
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.FAIL;
     }
 }

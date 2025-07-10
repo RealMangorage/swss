@@ -68,7 +68,6 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         super(menu, inventory, component);
         this.itemsPerPage = visibleRows * COLUMNS;
         this.allItems = getAllItems();
-        System.out.println("Constructor allItems size: " + this.allItems.size());  // Debug
         this.filteredItems = new ArrayList<>(allItems);
         this.imageHeight = 175 + (visibleRows - 3) * 18;
         this.imageWidth = 209;
@@ -82,16 +81,8 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     @Override
     public void update() {
         List<ItemStack> newAllItems = getAllItems();
-        if (newAllItems.size() != lastAllItemsSize) {
-            this.allItems = newAllItems;
-            onSearchChanged(searchBox != null ? searchBox.getValue() : "");
-            lastAllItemsSize = newAllItems.size();
-        } else {
-            String currentSearch = searchBox != null ? searchBox.getValue() : "";
-            if (!currentSearch.equals(lastSearchText)) {
-                onSearchChanged(currentSearch);
-            }
-        }
+        this.allItems = newAllItems;
+        onSearchChanged(searchBox != null ? searchBox.getValue() : "");
     }
 
     public List<ItemStack> getAllItems() {
@@ -379,6 +370,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     @Override
     protected void containerTick() {
         if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.connection.send(RequestNetworkItemsPacketC2S.INSTANCE);
             Minecraft.getInstance().player.connection.send(RequestNetworkItemsPacketC2S.INSTANCE);
         }
     }
