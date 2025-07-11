@@ -18,7 +18,7 @@ import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
-public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implements IUpdatable {
+public final class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implements IUpdatable {
 
     private int networkButtonX = 10;
     private int networkButtonY = 22;

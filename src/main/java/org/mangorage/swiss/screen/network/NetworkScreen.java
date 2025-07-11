@@ -14,7 +14,7 @@ import org.mangorage.swiss.storage.util.IUpdatable;
 
 import java.util.List;
 
-public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implements IUpdatable {
+public final class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implements IUpdatable {
 
     private final List<String> stringList = List.of(
             "network1", "network2", "network3", "network4", "network5", "network6"

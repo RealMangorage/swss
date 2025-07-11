@@ -20,7 +20,7 @@ import org.mangorage.swiss.util.MouseUtil;
 
 import java.util.List;
 
-public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implements IUpdatable {
+public final class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implements IUpdatable {
 
     private EditBox createNetworkNameEditBox;
     private EditBox createNetworkPasswordEditBox;
