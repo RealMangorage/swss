@@ -17,9 +17,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.client.button.Button;
+import org.mangorage.swiss.client.button.ButtonStack;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.request.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.registry.SWISSDataComponents;
+import org.mangorage.swiss.screen.Buttons;
 import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
@@ -28,7 +31,7 @@ import org.mangorage.swiss.world.ItemCount;
 
 import java.util.*;
 
-public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu> implements IUpdatable {
+public final class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu> implements IUpdatable {
 
     private EditBox searchBox;
     private List<ItemStack> allItems;
@@ -48,8 +51,6 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     private String lastSearchText = "";
     private ItemStack selected = ItemStack.EMPTY;
 
-    private int settingsButtonX = 0;
-    private int settingsButtonY = 2;
     private int rowButtonX = 0;
     private int rowButtonY = 20;
 
@@ -60,10 +61,23 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_row.png");
     static final ResourceLocation SCROLL_SPRITE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_scroll.png");
-    static final ResourceLocation SETTINGS_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_settings.png");
-    static final ResourceLocation ROW_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_row.png");
+
+    private final ButtonStack DEFAULT_STORAGE_INTERFACE = new ButtonStack.Builder()
+            .add(Buttons.DEFAULT_INTERFACE)
+            .addButton(
+                    new Button(
+                            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_row.png"),
+                            0, 42,
+                            0, 0,
+                            17, 17,
+                            17, 17,
+                            this::cycleVisibleRows,
+                            (guiGraphics, font, mouseX, mouseY, x, y) -> {
+                                guiGraphics.renderTooltip(font, Component.translatable("gui.swiss.configure_block_network"), mouseX, mouseY);
+                            }
+                    )
+            )
+            .build();
 
     public StoragePanelScreen(StoragePanelMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -230,10 +244,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             guiGraphics.blit(ROW_SPRITE, startX, y, 0, 0, slotRowWidth, slotRowHeight, slotRowWidth, slotRowHeight);
         }
 
-        //Buttons
-        guiGraphics.blit(SETTINGS_BUTTON, leftPos, topPos + 2, 0, 0, 17, 17, 17, 17);
-        guiGraphics.blit(ROW_BUTTON, leftPos, topPos + 20, 0, 0, 17, 17, 17, 17);
+        // Buttons
 
+        DEFAULT_STORAGE_INTERFACE.blit(guiGraphics, leftPos, topPos);
     }
 
 
@@ -274,7 +287,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         }
 
         renderTooltip(guiGraphics, mouseX, mouseY);
-        renderButtonTooltips(guiGraphics, mouseX, mouseY, leftPos, topPos);
+        DEFAULT_STORAGE_INTERFACE.renderButtonTooltips(guiGraphics, this.font, mouseX, mouseY, leftPos, topPos);
     }
 
     public static void renderAmount(final GuiGraphics graphics, final int x, final int y, final String text, final int color) {
@@ -316,16 +329,7 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
             searchBox.setFocused(false);
         }
 
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
-            Minecraft.getInstance().getConnection().send(
-                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Settings
-            );
-        }
-
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + rowButtonX, topPos + rowButtonY, 0, 0, 17, 17)) {
-            cycleVisibleRows(button);
-        }
-
+        DEFAULT_STORAGE_INTERFACE.mouseClicked( (int) mouseX, (int) mouseY, button, leftPos, topPos);
 
         for (int i = 0; i < itemsPerPage; i++) {
             int index = scrollIndex + i;
@@ -341,14 +345,14 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
                     if (!stack.isEmpty()) {
                         assert Minecraft.getInstance().player != null;
                         Minecraft.getInstance().player.connection.send(
-                                new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal(), 0)
+                                new MenuInteractPacketC2S(stack, ClickType.PICKUP.ordinal(), 4)
                         );
                     }
                 } else {
                     // Clicked on empty slot - send packet with empty ItemStack or special action
                     assert Minecraft.getInstance().player != null;
                     Minecraft.getInstance().player.connection.send(
-                            new MenuInteractPacketC2S(ItemStack.EMPTY, ClickType.PICKUP.ordinal(), 0)
+                            new MenuInteractPacketC2S(ItemStack.EMPTY, ClickType.PICKUP.ordinal(), 4)
                     );
                 }
                 return true;
@@ -434,15 +438,5 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
-
-        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY, 17, 17)) {
-            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.settings_menu"), mouseX, mouseY);
-        }
-        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, rowButtonX, rowButtonY, 17, 17)) {
-            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.row_menu"), mouseX, mouseY);
-        }
     }
 }

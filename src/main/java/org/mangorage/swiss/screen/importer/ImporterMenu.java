@@ -73,6 +73,16 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
                     }
             );
 
+        } else if (button == 2) {
+            player.openMenu(
+                    new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos),
+                            Component.translatable("gui.swiss.configure_block_network")
+                    ), buf -> {
+                        buf.writeBlockPos(blockPos);
+                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player));
+                    }
+            );
         }
     }
 

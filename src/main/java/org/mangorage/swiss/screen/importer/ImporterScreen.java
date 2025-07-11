@@ -13,19 +13,17 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncFilterItemsPacketC2S;
+import org.mangorage.swiss.screen.Buttons;
 import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
 import java.util.*;
 
-public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implements IUpdatable {
+public final class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implements IUpdatable {
 
     int filterY = 20;
     int upgradeY = 49;
-
-    private int settingsButtonX = 0;
-    private int settingsButtonY = 2;
 
     private List<ItemStack> filterItems = new ArrayList<>();
     private List<ItemStack> upgradeItems = new ArrayList<>();
@@ -33,8 +31,6 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implem
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/import_export_gui.png");
-    static final ResourceLocation SETTINGS_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_settings.png");
 
     public ImporterScreen(ImporterMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -102,7 +98,7 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implem
         RenderSystem.setShaderTexture(0, TEXTURE);
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        guiGraphics.blit(SETTINGS_BUTTON, leftPos, topPos + 2, 0, 0, 17, 17, 17, 17);
+        Buttons.DEFAULT_INTERFACE.blit(guiGraphics, leftPos, topPos);
     }
 
 
@@ -130,7 +126,7 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implem
             if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
                 guiGraphics.renderTooltip(font, filterStack, mouseX, mouseY);
             }
-            renderButtonTooltips(guiGraphics, mouseX, mouseY, leftPos, topPos);
+            Buttons.DEFAULT_INTERFACE.renderButtonTooltips(guiGraphics, this.font, mouseX, mouseY, leftPos, topPos);
         }
 
         // Render second row: upgrade items (9 across)
@@ -189,11 +185,7 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implem
             }
         }
 
-        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
-            Objects.requireNonNull(Minecraft.getInstance().getConnection()).send(
-                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Settings
-            );
-        }
+        Buttons.DEFAULT_INTERFACE.mouseClicked( (int) mouseX, (int) mouseY, button, leftPos, topPos);
 
         if (super.mouseClicked(mouseX, mouseY, button)) return true;
 
@@ -220,12 +212,5 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> implem
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-
-    private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
-        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY, 17, 17)) {
-            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.settings_menu"), mouseX, mouseY);
-        }
     }
 }
