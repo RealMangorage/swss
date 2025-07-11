@@ -10,12 +10,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.network.JoinNetworkPacketC2S;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
@@ -58,8 +56,15 @@ public class ConfigureBlockNetworkScreen extends AbstractContainerScreen<Configu
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
+    }
+
+    @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
 
         joinNetworkPasswordEditBox = new EditBox(font, leftPos + textAdjust, topPos + 56, 80, 14, Component.translatable("gui.swiss.join_password"));
         addRenderableWidget(joinNetworkPasswordEditBox);
@@ -105,6 +110,7 @@ public class ConfigureBlockNetworkScreen extends AbstractContainerScreen<Configu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MousePositionManagerUtil.getLastKnownPosition();
 
         int yOffset = topPos + 22;
         int maxIndex = Math.min(networkScrollIndex + VISIBLE_NETWORKS, knownNetworks.size());

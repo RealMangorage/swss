@@ -1,7 +1,10 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
+    id 'net.darkhax.curseforgegradle' version '1.1.24'
     id 'net.neoforged.moddev' version '2.0.97'
 }
 
@@ -180,3 +183,39 @@ idea {
         downloadJavadoc = true
     }
 }
+
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    group "modpublishing"
+
+    apiToken = System.getenv("curseforge_token").toString()
+
+    def projectId = 1301956
+    def mainFile = upload(projectId, jar)
+
+    mainFile.changelog = changelog
+    mainFile.releaseType = "release"
+    mainFile.gameVersions.addAll("1.21", "1.21.1")
+    mainFile.addModLoader("neoforge")
+}
+
+/*
+tasks.getByName("modrinth").setGroup("modpublishing")
+
+modrinth {
+    token = System.getenv("modrinth_token").toString()
+    projectId = "tfpHINm8"
+    versionType = "release"
+    versionName = "bbl-core-" + "$minecraft_version" + "-" + "$mod_version"
+    uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
+
+    gameVersions.addAll("1.21", "1.21.1")
+
+    loaders = ["neoforge"]
+    changelog = project.changelog
+    dependencies {
+        optional.project "jei"
+    }
+}
+
+ */
+

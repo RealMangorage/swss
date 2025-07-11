@@ -13,6 +13,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncFilterItemsPacketC2S;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 
@@ -84,8 +85,15 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
+    }
+
+    @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
 
         this.filterItems = getMenu().blockEntity.getExportItems();
 
@@ -151,6 +159,8 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MousePositionManagerUtil.getLastKnownPosition();
+
         int startX = leftPos + 25;
 
         // Get the item currently held on cursor

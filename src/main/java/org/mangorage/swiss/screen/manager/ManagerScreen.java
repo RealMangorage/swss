@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.CreateNetworkPacketC2S;
 import org.mangorage.swiss.network.JoinNetworkPacketC2S;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
@@ -60,8 +61,16 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
+    }
+
+    @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
+
         this.clearWidgets();
 
         if (managerModes == ManagerModes.CREATE) {
@@ -142,6 +151,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MousePositionManagerUtil.getLastKnownPosition();
+
         if (managerModes == ManagerModes.CREATE) {
             if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + managerButtonX, topPos + managerButtonY, 0, 0, 17, 17)) {
                 managerModes = ManagerModes.JOIN;

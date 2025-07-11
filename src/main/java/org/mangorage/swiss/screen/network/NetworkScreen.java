@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
 
 import java.util.List;
@@ -41,6 +42,13 @@ public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implemen
     @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
     }
 
     @Override
@@ -73,6 +81,8 @@ public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implemen
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MousePositionManagerUtil.getLastKnownPosition();
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

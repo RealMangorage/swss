@@ -1,0 +1,9 @@
+Changelog SWISS
+
+
+0.3.0
+Added changelog file
+Changed import and export texture screen (removed the scroll bar)
+Added MousePositionManagerUtil allows to restore the mouse position after a screen change
+Mouse positions no longer reset when changing screen inside a screen
+Added mod_description and mod_authors to properties file

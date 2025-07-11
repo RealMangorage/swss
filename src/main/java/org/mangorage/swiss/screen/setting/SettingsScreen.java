@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
@@ -48,10 +49,17 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
     public void update() {
     }
 
+    @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
+    }
 
     @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
+
         this.menuOpenPosition = this.menu.getBlockPos();
     }
 
@@ -87,6 +95,7 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MousePositionManagerUtil.getLastKnownPosition();
 
         if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + networkButtonX, topPos + networkButtonY, 0, 0, 17, 17)) {
             Minecraft.getInstance().getConnection().send(

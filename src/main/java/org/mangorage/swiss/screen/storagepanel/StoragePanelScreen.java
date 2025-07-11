@@ -20,6 +20,7 @@ import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.request.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.registry.SWISSDataComponents;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.util.NumbersUtil;
@@ -134,8 +135,15 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        MousePositionManagerUtil.clear();
+    }
+
+    @Override
     protected void init() {
         super.init();
+        MousePositionManagerUtil.setLastKnownPosition();
 
         this.clearWidgets();
         this.menu.slots.clear();
@@ -288,6 +296,9 @@ public class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+
+        MousePositionManagerUtil.getLastKnownPosition();
+
         int startX = leftPos + 25;
         int startY = topPos + 20;
         int slotSize = 18;
