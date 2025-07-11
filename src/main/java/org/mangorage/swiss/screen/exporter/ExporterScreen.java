@@ -19,7 +19,7 @@ import org.mangorage.swiss.util.MouseUtil;
 
 import java.util.*;
 
-public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implements IUpdatable {
+public  class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implements IUpdatable {
 
     private int scrollIndex = 0; // starting item index
     private static final int ITEMS_PER_PAGE = 24;
@@ -42,7 +42,9 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/import_export_gui.png");
     static final ResourceLocation SETTINGS_BUTTON =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_settings.png");
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_block.png");
+    static final ResourceLocation NETWORK_BUTTON =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID, "textures/gui/button_network.png");
 
     public ExporterScreen(ExporterMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -79,11 +81,6 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
         PacketDistributor.sendToServer(new SyncFilterItemsPacketC2S(filterItemsMap, this.menu.getBlockEntity().getBlockPos()));
     }
 
-
-    public List<ItemStack> getAllItems() {
-        return menu.itemStacks;
-    }
-
     @Override
     public void onClose() {
         super.onClose();
@@ -107,9 +104,10 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
         guiGraphics.blit(SETTINGS_BUTTON, leftPos, topPos + 2, 0, 0, 17, 17, 17, 17);
+        guiGraphics.blit(NETWORK_BUTTON, leftPos, topPos + 20, 0, 0, 17, 17, 17, 17);
     }
 
 
@@ -197,8 +195,14 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
         }
 
         if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY, 0, 0, 17, 17)) {
-            Objects.requireNonNull(Minecraft.getInstance().getConnection()).send(
+            Minecraft.getInstance().getConnection().send(
                     new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 1) // Open Settings
+            );
+        }
+
+        if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, leftPos + settingsButtonX, topPos + settingsButtonY + 20, 0, 0, 17, 17)) {
+            Minecraft.getInstance().getConnection().send(
+                    new MenuInteractPacketC2S(ItemStack.EMPTY, 0, 2) // Open Settings
             );
         }
 
@@ -233,6 +237,10 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> implem
     private void renderButtonTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y) {
         if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY, 17, 17)) {
             guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.settings_menu"), mouseX, mouseY);
+        }
+
+        if (MouseUtil.isMouseAboveArea(mouseX, mouseY, x, y, settingsButtonX, settingsButtonY + 20, 17, 17)) {
+            guiGraphics.renderTooltip(this.font, Component.translatable("gui.swiss.configure_block_network"), mouseX, mouseY);
         }
     }
 }

@@ -51,9 +51,6 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
         map.put(Direction.DOWN,  Block.box(inset, 16.0 - thickness, inset, extent, 16.0, extent));
     });
 
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
-
     public PanelNetworkBlock(Properties properties, BiFunction<BlockPos, BlockState, BlockEntity> function) {
         super(properties, function);
     }
@@ -61,34 +58,5 @@ public final class PanelNetworkBlock extends AbstractBaseNetworkBlock {
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE_CACHE.get(state.getValue(FACING));
-    }
-
-    @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        Level level = context.getLevel();
-        BlockPos blockPos = context.getClickedPos();
-        BlockState blockState = context.getLevel().getBlockState(blockPos);
-        Direction direction = context.getClickedFace().getOpposite();
-
-        if (blockState.is(Blocks.WATER)) {
-            return this.defaultBlockState().setValue(WATERLOGGED, true).setValue(FACING, direction.getOpposite());
-        } else {
-            return this.defaultBlockState().setValue(WATERLOGGED, false).setValue(FACING, direction.getOpposite());
-        }
-    }
-
-    /* ROTATION */
-    @Override
-    public @NotNull BlockState rotate(BlockState blockState, @NotNull LevelAccessor level, @NotNull BlockPos blockPos, Rotation direction) {
-        return blockState.setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)).setValue(FACING, direction.rotate(blockState.getValue(FACING)));
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(WATERLOGGED, FACING);
-    }
-
-    public @NotNull FluidState getFluidState(BlockState blockState) {
-        return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
     }
 }

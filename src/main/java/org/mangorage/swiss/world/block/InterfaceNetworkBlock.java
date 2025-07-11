@@ -118,31 +118,10 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
         return rotated;
     }
 
-
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty CONNECTED = BlockStateProperties.ENABLED;
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public InterfaceNetworkBlock(Properties properties, BiFunction<BlockPos, BlockState, BlockEntity> function) {
         super(properties, function);
-    }
-
-    @Override
-    protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-        Direction facing = state.getValue(FACING); //
-        BlockPos supportPos = pos.relative(facing.getOpposite());
-        BlockState supportState = world.getBlockState(supportPos);
-
-        return supportState.isFaceSturdy(world, supportPos, facing);
-    }
-
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
-        if (!canSurvive(state, level, pos)) {
-            level.destroyBlock(pos, true);
-            return;
-        }
-        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
     }
 
     @Override
@@ -151,36 +130,8 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
     }
 
     @Override
-    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos, int flags, int recursionLeft) {
-        super.updateIndirectNeighbourShapes(state, level, pos, flags, recursionLeft);
-    }
-
-    @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        Level level = context.getLevel();
-        BlockPos blockPos = context.getClickedPos();
-        BlockState blockState = context.getLevel().getBlockState(blockPos);
-        Direction direction = context.getClickedFace().getOpposite();
-
-        if (blockState.is(Blocks.WATER)) {
-            return this.defaultBlockState().setValue(WATERLOGGED, true).setValue(FACING, direction.getOpposite());
-        } else {
-            return this.defaultBlockState().setValue(WATERLOGGED, false).setValue(FACING, direction.getOpposite());
-        }
-    }
-
-    /* ROTATION */
-    @Override
-    public @NotNull BlockState rotate(BlockState blockState, @NotNull LevelAccessor level, @NotNull BlockPos blockPos, Rotation direction) {
-        return blockState.setValue(WATERLOGGED, blockState.getValue(WATERLOGGED)).setValue(FACING, direction.rotate(blockState.getValue(FACING)));
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(WATERLOGGED, FACING, CONNECTED);
-    }
-
-    public @NotNull FluidState getFluidState(BlockState blockState) {
-        return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
+        super.createBlockStateDefinition(pBuilder);
+        pBuilder.add(CONNECTED);
     }
 }
