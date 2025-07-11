@@ -73,7 +73,7 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
                             17, 17,
                             this::cycleVisibleRows,
                             (guiGraphics, font, mouseX, mouseY, x, y) -> {
-                                guiGraphics.renderTooltip(font, Component.translatable("gui.swiss.configure_block_network"), mouseX, mouseY);
+                                guiGraphics.renderTooltip(font, Component.translatable("gui.swiss.row_menu"), mouseX, mouseY);
                             }
                     )
             )
