@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.network;
+package org.mangorage.swiss.screen.misc.network;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;

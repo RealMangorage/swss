@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mangorage.swiss.screen.test.TestMenu;
+import org.mangorage.swiss.screen.misc.test.TestMenu;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 

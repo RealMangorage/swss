@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.exporter;
+package org.mangorage.swiss.screen.interfaces.exporter;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;

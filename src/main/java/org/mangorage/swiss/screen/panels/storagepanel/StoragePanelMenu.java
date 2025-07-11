@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.storagepanel;
+package org.mangorage.swiss.screen.panels.storagepanel;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +14,8 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.screen.MSMenuTypes;
-import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.setting.SettingsMenu;
+import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.INetworkHolder;

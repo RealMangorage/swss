@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.setting;
+package org.mangorage.swiss.screen.misc.setting;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;

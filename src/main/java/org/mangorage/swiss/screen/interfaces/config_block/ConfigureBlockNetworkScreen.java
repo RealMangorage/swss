@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.config_block;
+package org.mangorage.swiss.screen.interfaces.config_block;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;

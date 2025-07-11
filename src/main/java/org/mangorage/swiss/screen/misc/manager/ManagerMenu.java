@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.manager;
+package org.mangorage.swiss.screen.misc.manager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

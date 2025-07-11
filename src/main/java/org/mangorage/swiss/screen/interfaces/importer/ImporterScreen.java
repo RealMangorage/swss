@@ -1,7 +1,6 @@
-package org.mangorage.swiss.screen.importer;
+package org.mangorage.swiss.screen.interfaces.importer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -11,12 +10,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncFilterItemsPacketC2S;
 import org.mangorage.swiss.screen.Buttons;
 import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
-import org.mangorage.swiss.util.MouseUtil;
 
 import java.util.*;
 

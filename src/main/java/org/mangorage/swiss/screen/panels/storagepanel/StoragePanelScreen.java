@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.storagepanel;
+package org.mangorage.swiss.screen.panels.storagepanel;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

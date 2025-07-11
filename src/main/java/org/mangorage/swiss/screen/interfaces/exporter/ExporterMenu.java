@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.importer;
+package org.mangorage.swiss.screen.interfaces.exporter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,18 +15,19 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
-import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IPacketRequest;
-import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ImporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
+public final class ExporterMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
-    public ItemImporterBlockEntity blockEntity;
+    public ItemExporterBlockEntity blockEntity;
     List<ItemStack> itemStacks = List.of();
     public Level level;
     public Player player;
@@ -34,30 +35,34 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
     public List<ItemStack> filterItems = new ArrayList<>();
 
 
-    public ImporterMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
+    public ExporterMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos());
 
     }
 
-    public ImporterMenu(int containerID, Inventory inventory, BlockPos blockPos) {
-        super(MSMenuTypes.IMPORTER_MENU.get(), containerID);
+    public ExporterMenu(int containerID, Inventory inventory, BlockPos blockPos) {
+        super(MSMenuTypes.EXPORTER_MENU.get(), containerID);
         this.player = inventory.player;
         this.blockPos = blockPos;
         this.level = inventory.player.level();
-        this.blockEntity = (ItemImporterBlockEntity) this.level.getBlockEntity(blockPos);
+        this.blockEntity = (ItemExporterBlockEntity) this.level.getBlockEntity(blockPos);
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
     }
 
-
-    public ItemImporterBlockEntity getBlockEntity() {
-        return (ItemImporterBlockEntity) blockEntity;
+    public ItemExporterBlockEntity getBlockEntity() {
+        return (ItemExporterBlockEntity) blockEntity;
     }
 
     @Override
     public void sendAllDataToRemote() {
         super.sendAllDataToRemote();
+        if (!level.isClientSide()) {
+            //final var items = blockEntity.getItems();
+            //final var sp = (ServerPlayer) player;
+            //sp.connection.send(new SyncNetworkItemsPacketS2C(items));
+        }
     }
 
     @Override
@@ -65,14 +70,12 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
         if (button == 1) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos),
+                            (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.configure_block_network")
                     ), buf -> {
                         buf.writeBlockPos(blockPos);
-                        NetworkInfo.LIST_STREAM_CODEC.encode(buf, StorageNetworkManager.getInstance().getNetworkInfo((ServerPlayer) player));
                     }
             );
-
         } else if (button == 2) {
             player.openMenu(
                     new SimpleMenuProvider(
@@ -112,7 +115,7 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
     @Override
     public boolean stillValid(@NotNull Player player) {
         return stillValid(ContainerLevelAccess.create(player.level(), blockPos),
-                player, SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get());
+                player, SWISSBlocks.EXPORTER_ITEM_INTERFACE_BLOCK.get());
     }
 
 

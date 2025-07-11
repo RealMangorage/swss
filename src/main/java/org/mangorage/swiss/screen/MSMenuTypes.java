@@ -6,14 +6,14 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.mangorage.swiss.SWISS;
-import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.exporter.ExporterMenu;
-import org.mangorage.swiss.screen.importer.ImporterMenu;
-import org.mangorage.swiss.screen.manager.ManagerMenu;
-import org.mangorage.swiss.screen.network.NetworkMenu;
-import org.mangorage.swiss.screen.setting.SettingsMenu;
-import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
-import org.mangorage.swiss.screen.test.TestMenu;
+import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.interfaces.exporter.ExporterMenu;
+import org.mangorage.swiss.screen.interfaces.importer.ImporterMenu;
+import org.mangorage.swiss.screen.misc.manager.ManagerMenu;
+import org.mangorage.swiss.screen.misc.network.NetworkMenu;
+import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
+import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelMenu;
+import org.mangorage.swiss.screen.misc.test.TestMenu;
 
 public final class MSMenuTypes {
 

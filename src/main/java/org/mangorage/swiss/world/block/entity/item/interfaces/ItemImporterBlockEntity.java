@@ -8,26 +8,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.mangorage.swiss.StorageNetworkManager;
-import org.mangorage.swiss.registry.SWISSBlocks;
-import org.mangorage.swiss.screen.config_block.ConfigureBlockNetworkMenu;
-import org.mangorage.swiss.screen.importer.ImporterMenu;
+import org.mangorage.swiss.screen.interfaces.importer.ImporterMenu;
 import org.mangorage.swiss.screen.util.HasMenu;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.util.IRightClickable;
@@ -39,7 +30,6 @@ import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public final class ItemImporterBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, IRightClickable, HasMenu {
     private int ticks = 0;

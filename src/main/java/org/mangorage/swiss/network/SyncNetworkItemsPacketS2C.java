@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
-import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
+import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelMenu;
 
 import java.util.List;
 

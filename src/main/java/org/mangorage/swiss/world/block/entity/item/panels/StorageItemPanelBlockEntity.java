@@ -4,21 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.mangorage.swiss.screen.storagepanel.StoragePanelMenu;
+import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelMenu;
 import org.mangorage.swiss.screen.util.HasMenu;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.ItemDevice;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
 import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
 import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, ItemDevice, HasMenu {
 
