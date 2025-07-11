@@ -36,7 +36,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
     private int managerButtonY = 4;
     private int confirmButtonX = 155;
     private int confirmButtonY = 55;
-
+    private boolean draggingScrollBar = false;
+    private int dragOffsetY = 0;
 
     private ManagerModes managerModes = ManagerModes.CREATE;
 
@@ -48,6 +49,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager_create.png");
     private static final ResourceLocation BUTTON_CONFIRM =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_confirm.png");
+    static final ResourceLocation SCROLL_SPRITE =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_scroll.png");
 
     public ManagerScreen(ManagerMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -74,15 +77,15 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
         this.clearWidgets();
 
         if (managerModes == ManagerModes.CREATE) {
-            createNetworkNameEditBox = new EditBox(font, leftPos + textAdjust, topPos + 28, 80, 14, Component.translatable("gui.swiss.name"));
+            createNetworkNameEditBox = new EditBox(font, leftPos + textAdjust, topPos + 28, 117, 14, Component.translatable("gui.swiss.name"));
             addRenderableWidget(createNetworkNameEditBox);
 
-            createNetworkPasswordEditBox = new EditBox(font, leftPos + textAdjust, topPos + 56, 80, 14, Component.translatable("gui.swiss.password"));
+            createNetworkPasswordEditBox = new EditBox(font, leftPos + textAdjust, topPos + 56, 117, 14, Component.translatable("gui.swiss.password"));
             addRenderableWidget(createNetworkPasswordEditBox);
         }
 
         if (managerModes == ManagerModes.JOIN) {
-            joinNetworkPasswordEditBox = new EditBox(font, leftPos + textAdjust, topPos + 56, 80, 14, Component.translatable("gui.swiss.join_password"));
+            joinNetworkPasswordEditBox = new EditBox(font, leftPos + textAdjust, topPos + 56, 117, 14, Component.translatable("gui.swiss.join_password"));
             addRenderableWidget(joinNetworkPasswordEditBox);
         }
     }
@@ -125,6 +128,28 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
 
             guiGraphics.drawString(font, Component.translatable("gui.swiss.join_network"), leftPos + textAdjust, topPos + 6, 4210752, false);
 
+            // Box around the list
+            int listX = leftPos + textAdjust + 3;
+            int listY = topPos + 22;
+            int listWidth = 100;
+            int listHeight = (font.lineHeight + 2) * VISIBLE_NETWORKS;
+
+            // Background and border
+            guiGraphics.fill(listX - 2, listY - 2, listX + listWidth, listY + listHeight, 0xFFDDDDDD); // Background
+            guiGraphics.fill(listX - 3, listY - 3, listX + listWidth + 1, listY - 2, 0xFF000000); // Top
+            guiGraphics.fill(listX - 3, listY + listHeight, listX + listWidth + 1, listY + listHeight + 1, 0xFF000000); // Bottom
+            guiGraphics.fill(listX - 3, listY - 2, listX - 2, listY + listHeight, 0xFF000000); // Left
+            guiGraphics.fill(listX + listWidth, listY - 2, listX + listWidth + 1, listY + listHeight, 0xFF000000); // Right
+
+            // Coordinates of the scrollbar box
+            int scrollBoxX = listX + listWidth + 2;
+            int scrollBoxWidth = 11; // enough space for visual box + sprite
+            int scrollBoxY = listY - 1;
+            int scrollBoxHeight = listHeight + 1;
+
+
+
+            // Draw the list of networks
             int yOffset = 22;
             int maxIndex = Math.min(networkScrollIndex + VISIBLE_NETWORKS, knownNetworks.size());
 
@@ -132,13 +157,48 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
                 NetworkInfo info = knownNetworks.get(i);
                 boolean isSelected = selectedNetwork != null && selectedNetwork.equals(info);
 
-                Component networkText = Component.literal(info.networkName())
-                        .withStyle(style -> style.withUnderlined(true).withColor(isSelected ? 0x00AAFF : 0x000000));
+                int textX = leftPos + textAdjust + 8;
+                int textY = topPos + yOffset;
+                int textWidth = font.width(info.networkName());
+                int textHeight = font.lineHeight;
 
-                guiGraphics.drawString(font, networkText, leftPos + textAdjust + 5, topPos + yOffset, 4210752, false);
+                if (isSelected) {
+                    guiGraphics.fill(textX - 2, textY - 1, textX + textWidth + 2, textY + textHeight + 1, 0xFF00AAFF);
+                }
+
+                Component networkText = Component.literal(info.networkName())
+                        .withStyle(style -> style.withUnderlined(true).withColor(isSelected ? 0xFFFFFF : 0x000000));
+
+                guiGraphics.drawString(font, networkText, textX, textY, 4210752, false);
                 yOffset += font.lineHeight + 2;
             }
+
+            // Render scroll bar if needed
+            if (knownNetworks.size() > VISIBLE_NETWORKS) {
+
+                // Draw scrollbar box (container)
+                guiGraphics.fill(scrollBoxX - 1, scrollBoxY - 1, scrollBoxX + scrollBoxWidth, scrollBoxY + scrollBoxHeight + 1, 0xFFCCCCCC); // Background
+                guiGraphics.fill(scrollBoxX - 2, scrollBoxY - 2, scrollBoxX + scrollBoxWidth + 1, scrollBoxY - 1, 0xFF000000); // Top border
+                guiGraphics.fill(scrollBoxX - 2, scrollBoxY + scrollBoxHeight, scrollBoxX + scrollBoxWidth + 1, scrollBoxY + scrollBoxHeight + 1, 0xFF000000); // Bottom
+                guiGraphics.fill(scrollBoxX - 2, scrollBoxY - 1, scrollBoxX - 1, scrollBoxY + scrollBoxHeight, 0xFF000000); // Left
+                guiGraphics.fill(scrollBoxX + scrollBoxWidth, scrollBoxY - 1, scrollBoxX + scrollBoxWidth + 1, scrollBoxY + scrollBoxHeight, 0xFF000000); // Right
+
+
+                int scrollBarX = listX + listWidth + 1;
+                int scrollBarY = listY - 2;
+                int scrollBarHeight = listHeight + 2;
+
+                int totalNetworks = knownNetworks.size();
+                int maxScroll = totalNetworks - VISIBLE_NETWORKS;
+
+                int thumbY = scrollBarY + ((scrollBarHeight - 15) * networkScrollIndex) / maxScroll;
+
+                // Scroll bar thumb
+                guiGraphics.blit(SCROLL_SPRITE, scrollBarX, thumbY, 168, 0, 12, 15, 12, 15);
+            }
         }
+
+
 
 
 
@@ -169,6 +229,30 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
             }
 
         }else if (managerModes == ManagerModes.JOIN) {
+
+            // Scrollbar drag start
+            int listX = leftPos + textAdjust + 3;
+            int listY = topPos + 22;
+            int listWidth = 100;
+            int listHeight = (font.lineHeight + 2) * VISIBLE_NETWORKS;
+
+            int scrollBarX = listX + listWidth + 1;
+            int scrollBarY = listY - 2;
+            int scrollBarHeight = listHeight + 2;
+            int totalNetworks = knownNetworks.size();
+            int maxScroll = totalNetworks - VISIBLE_NETWORKS;
+
+            if (totalNetworks > VISIBLE_NETWORKS) {
+                int thumbHeight = 15;
+                int thumbY = scrollBarY + ((scrollBarHeight - thumbHeight) * networkScrollIndex) / maxScroll;
+
+                if (MouseUtil.isMouseAboveArea((int) mouseX, (int) mouseY, scrollBarX, thumbY, 0, 0, 12, thumbHeight)) {
+                    draggingScrollBar = true;
+                    dragOffsetY = (int) mouseY - thumbY;
+                    return true;
+                }
+            }
+
             int yOffset = topPos + 22;
             int maxIndex = Math.min(networkScrollIndex + VISIBLE_NETWORKS, knownNetworks.size());
 
@@ -209,11 +293,36 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-
-
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (draggingScrollBar && managerModes == ManagerModes.JOIN) {
+            int listHeight = (font.lineHeight + 2) * VISIBLE_NETWORKS;
+            int scrollBarY = topPos + 22;
+            int scrollBarHeight = listHeight;
+
+            int totalNetworks = knownNetworks.size();
+            int maxScroll = totalNetworks - VISIBLE_NETWORKS;
+
+            int thumbHeight = 15;
+            int trackHeight = scrollBarHeight - thumbHeight;
+
+            int newThumbY = (int) mouseY - dragOffsetY;
+            newThumbY = Math.max(scrollBarY, Math.min(scrollBarY + trackHeight, newThumbY));
+
+            int relativeY = newThumbY - scrollBarY;
+            networkScrollIndex = (relativeY * maxScroll) / trackHeight;
+            networkScrollIndex = Math.max(0, Math.min(maxScroll, networkScrollIndex));
+
+            return true;
+        }
+
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        draggingScrollBar = false;
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
@@ -238,6 +347,13 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerMenu> implemen
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
+
+        boolean isFocused = createNetworkNameEditBox.isFocused() || createNetworkPasswordEditBox.isFocused() || joinNetworkPasswordEditBox.isFocused();
+
+        if (isFocused && keyCode == Minecraft.getInstance().options.keyInventory.getKey().getValue()) {
+            return true;
+        }
+
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

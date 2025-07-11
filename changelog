@@ -1,5 +1,10 @@
 Changelog SWISS
 
+1.0.0
+Added link to changelog for auto updating
+Added Curseforge and Modrinth auto updating (created modrinth project)
+Added recipes for the interfaces
+Improved the join network screen (inside panel, this should probably replace the other screen in all other blocks)
 
 0.3.0
 Added changelog file

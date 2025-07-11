@@ -24,10 +24,9 @@ public class NetworkScreen extends AbstractContainerScreen<NetworkMenu> implemen
     private final int maxVisibleLines = 3; // Adjust depending on UI height
     private final int lineHeight = 12;
 
-
-
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/settings_gui.png");
+
 
     public NetworkScreen(NetworkMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);

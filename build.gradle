@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'net.darkhax.curseforgegradle' version '1.1.24'
+    id "com.modrinth.minotaur" version "2.+"
     id 'net.neoforged.moddev' version '2.0.97'
 }
 
@@ -198,14 +199,13 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     mainFile.addModLoader("neoforge")
 }
 
-/*
 tasks.getByName("modrinth").setGroup("modpublishing")
 
 modrinth {
     token = System.getenv("modrinth_token").toString()
-    projectId = "tfpHINm8"
+    projectId = "p7J055HU"
     versionType = "release"
-    versionName = "bbl-core-" + "$minecraft_version" + "-" + "$mod_version"
+    versionName = "swiss-" + "$mod_version"
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
 
     gameVersions.addAll("1.21", "1.21.1")
@@ -213,9 +213,5 @@ modrinth {
     loaders = ["neoforge"]
     changelog = project.changelog
     dependencies {
-        optional.project "jei"
     }
 }
-
- */
-

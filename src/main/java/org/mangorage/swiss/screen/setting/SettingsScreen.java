@@ -37,6 +37,8 @@ public class SettingsScreen extends AbstractContainerScreen<SettingsMenu> implem
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_manager.png");
     static final ResourceLocation BLOCK_BUTTON =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/button_block.png");
+    static final ResourceLocation SCROLL_SPRITE =
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_scroll.png");
 
     public SettingsScreen(SettingsMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
