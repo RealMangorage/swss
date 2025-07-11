@@ -17,7 +17,6 @@ import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 public final class NetworkMenu extends AbstractContainerMenu implements ISyncableNetworkHandler {
 
     private Level level;
-    private ContainerData data;
     private Player player;
     private BlockPos blockPos;
 
@@ -34,8 +33,6 @@ public final class NetworkMenu extends AbstractContainerMenu implements ISyncabl
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
-
-        addDataSlots(data);
     }
 
     @Override
