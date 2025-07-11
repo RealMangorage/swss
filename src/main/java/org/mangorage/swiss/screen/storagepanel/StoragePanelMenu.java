@@ -42,8 +42,6 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         this(containerID, inventory, extraData.readBlockPos());
     }
 
-
-
     public StoragePanelMenu(int containerID, Inventory inventory, BlockPos blockPos) {
         super(MSMenuTypes.STORAGE_MENU.get(), containerID);
         this.player = inventory.player;

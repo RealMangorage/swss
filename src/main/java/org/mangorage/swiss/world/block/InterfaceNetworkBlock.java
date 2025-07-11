@@ -12,6 +12,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -124,6 +125,24 @@ public final class InterfaceNetworkBlock extends AbstractBaseNetworkBlock {
 
     public InterfaceNetworkBlock(Properties properties, BiFunction<BlockPos, BlockState, BlockEntity> function) {
         super(properties, function);
+    }
+
+    @Override
+    protected boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+        Direction facing = state.getValue(FACING); //
+        BlockPos supportPos = pos.relative(facing.getOpposite());
+        BlockState supportState = world.getBlockState(supportPos);
+
+        return supportState.isFaceSturdy(world, supportPos, facing);
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!canSurvive(state, level, pos)) {
+            level.destroyBlock(pos, true);
+            return;
+        }
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
     }
 
     @Override
