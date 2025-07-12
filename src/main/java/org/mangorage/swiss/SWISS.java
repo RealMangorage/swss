@@ -6,13 +6,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import org.mangorage.swiss.config.ClientConfig;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkScreen;
 import org.mangorage.swiss.screen.interfaces.exporter.ExporterScreen;
@@ -38,6 +41,9 @@ public final class SWISS {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public SWISS(IEventBus modEventBus, ModContainer modContainer) {
+
+        ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.CLIENT,
+                ClientConfig.SPEC, "swiss_client.toml");
 
         SWISSBlocks.register(modEventBus);
         SWISSBlockEntities.register(modEventBus);

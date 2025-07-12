@@ -53,7 +53,7 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
 
 
     public ItemImporterBlockEntity getBlockEntity() {
-        return (ItemImporterBlockEntity) blockEntity;
+        return blockEntity;
     }
 
     @Override

@@ -11,8 +11,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.config.ClientConfig;
+import org.mangorage.swiss.network.SyncVisibleRowsC2S;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
@@ -28,6 +31,8 @@ import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.network.Permission;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
+import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,8 +43,10 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     private INetworkHolder networkHolder;
     List<ItemStack> itemStacks = List.of();
     private Level level;
-    private Player player;
+    public Player player;
     private BlockPos blockPos;
+    public int visibleRows;
+    private StorageItemPanelBlockEntity blockEntity;
 
     public StoragePanelMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos());
@@ -51,6 +58,17 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         this.blockPos = blockPos;
         this.level = inventory.player.level();
         this.networkHolder = level.getBlockEntity(blockPos) instanceof INetworkHolder holder ? holder : null;
+        this.blockEntity = (StorageItemPanelBlockEntity) level.getBlockEntity(blockPos);
+
+        int rows = player.getPersistentData().getInt("swiss_visible_rows");
+        this.visibleRows = rows == 0 ? 3 : rows; // Default to 3 if not set
+
+        if (level.isClientSide()) {
+            System.out.println("client player count " + player.getPersistentData().getInt("swiss_visible_rows"));
+        }
+
+        System.out.println("server player count " + player.getPersistentData().getInt("swiss_visible_rows"));
+
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
@@ -165,14 +183,14 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
     public void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18 + 17, 36 + (StoragePanelScreen.visibleRows * 18) + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18 + 17, 36 + (visibleRows * 18) + i * 18));
             }
         }
     }
 
     public void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18 + 17, 94  + (StoragePanelScreen.visibleRows * 18) ));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18 + 17, 94  + (visibleRows * 18) ));
         }
     }
 

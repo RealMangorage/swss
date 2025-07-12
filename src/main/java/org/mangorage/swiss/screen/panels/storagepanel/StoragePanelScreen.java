@@ -15,11 +15,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.client.button.Button;
 import org.mangorage.swiss.client.button.ButtonStack;
+import org.mangorage.swiss.config.ClientConfig;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
+import org.mangorage.swiss.network.SyncVisibleRowsC2S;
 import org.mangorage.swiss.network.request.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.Buttons;
@@ -121,20 +124,29 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
     private void cycleVisibleRows(int button) {
         int maxRows = calculateMaxRows();
 
-        if (button == 0) { // Left click - cycle forward
-            visibleRows++;
-            if (visibleRows > maxRows) {
-                visibleRows = 3; // min visible rows
+        int currentRows = visibleRows;
+
+        if (button == 0) {
+            currentRows++;
+            if (currentRows > maxRows) {
+                currentRows = 3;
             }
-        } else if (button == 1) { // Right click - cycle backward
-            visibleRows--;
-            if (visibleRows < 3) {
-                visibleRows = maxRows; // wrap to max
+        } else if (button == 1) {
+            currentRows--;
+            if (currentRows < 3) {
+                currentRows = maxRows;
             }
         }
 
+        PacketDistributor.sendToServer(new SyncVisibleRowsC2S(currentRows));
+        this.menu.player.getPersistentData().putInt("swiss_visible_rows", currentRows);
+        this.menu.visibleRows = currentRows;
+        visibleRows = currentRows;
+
         updateGuiLayout();
     }
+
+
 
     private void updateGuiLayout() {
         itemsPerPage = visibleRows * COLUMNS;

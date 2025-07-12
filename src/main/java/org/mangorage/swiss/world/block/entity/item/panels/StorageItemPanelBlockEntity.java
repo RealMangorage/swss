@@ -17,6 +17,7 @@ import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
 public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, ItemDevice, HasMenu {
 
     private int ticks = 0;
+    private int visibleRows = 3;
 
     public StorageItemPanelBlockEntity(BlockPos pos, BlockState blockState) {
         super(SWISSBlockEntities.STORAGE_ITEM_PANEL_BLOCK_ENTITY.get(), pos, blockState);
@@ -28,6 +29,10 @@ public final class StorageItemPanelBlockEntity extends BaseStorageBlockEntity im
         if (ticks % 20 == 0) {
             connectToNetwork(); // Connect if we havent already done so...
         }
+    }
+
+    public int getVisibleRows() {
+        return visibleRows;
     }
 
     @Override
