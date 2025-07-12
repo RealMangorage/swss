@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.darkhax.curseforgegradle' version '1.1.24'
+    id 'net.darkhax.curseforgegradle' version '1.1.26'
     id "com.modrinth.minotaur" version "2.+"
     id 'net.neoforged.moddev' version '2.0.97'
 }
@@ -188,30 +188,41 @@ idea {
 tasks.register('publishCurseForge', TaskPublishCurseForge) {
     group "modpublishing"
 
-    apiToken = System.getenv("curseforge_token").toString()
+    if (System.getenv("curseforge_token") != null) {
+        apiToken = System.getenv("curseforge_token")
+    } else {
+        apiToken = findProperty('curseforge_token')
+    }
 
     def projectId = 1301956
     def mainFile = upload(projectId, jar)
 
+    mainFile.displayName = "SWISS " + version
     mainFile.changelog = changelog
     mainFile.releaseType = "release"
     mainFile.gameVersions.addAll("1.21", "1.21.1")
     mainFile.addModLoader("neoforge")
 }
 
-tasks.getByName("modrinth").setGroup("modpublishing")
-
 modrinth {
-    token = System.getenv("modrinth_token").toString()
-    projectId = "p7J055HU"
+
+    setToken(findProperty("modrinth_token"))
+
+    projectId = "6kqyfFc0"
     versionType = "release"
-    versionName = "swiss-" + "$mod_version"
+    versionName = "SWISS " + "$mod_version"
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
 
     gameVersions.addAll("1.21", "1.21.1")
 
     loaders = ["neoforge"]
     changelog = project.changelog
-    dependencies {
-    }
 }
+
+tasks.register("publishAll") {
+    group "modpublishing"
+    mustRunAfter "modrinth", "publishCurseForge"
+    dependsOn "modrinth", "publishCurseForge"
+}
+
+tasks.getByName("modrinth").setGroup("modpublishing")
