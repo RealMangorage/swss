@@ -63,13 +63,6 @@ public final class StoragePanelMenu extends AbstractContainerMenu implements ISy
         int rows = player.getPersistentData().getInt("swiss_visible_rows");
         this.visibleRows = rows == 0 ? 3 : rows; // Default to 3 if not set
 
-        if (level.isClientSide()) {
-            System.out.println("client player count " + player.getPersistentData().getInt("swiss_visible_rows"));
-        }
-
-        System.out.println("server player count " + player.getPersistentData().getInt("swiss_visible_rows"));
-
-
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
     }
