@@ -12,6 +12,12 @@ public class MousePositionManagerUtil {
 
     public static void getLastKnownPosition() {
         Minecraft mc = Minecraft.getInstance();
+
+        if (lastMouseX == -1 || lastMouseY == -1) {
+            lastMouseX = mc.getWindow().getScreenWidth() / 2.0;
+            lastMouseY = mc.getWindow().getScreenHeight() / 2.0;
+        }
+
         lastMouseX = mc.mouseHandler.xpos();
         lastMouseY = mc.mouseHandler.ypos();
     }

@@ -16,6 +16,7 @@ import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
+import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.network.NetworkInfo;
@@ -65,7 +66,7 @@ public final class ImporterMenu extends AbstractContainerMenu implements ISyncab
         if (button == 1) {
             player.openMenu(
                     new SimpleMenuProvider(
-                            (windowId, playerInventory, playerEntity) -> new ConfigureBlockNetworkMenu(windowId, playerInventory, blockPos),
+                            (windowId, playerInventory, playerEntity) -> new SettingsMenu(windowId, playerInventory, blockPos),
                             Component.translatable("gui.swiss.configure_block_network")
                     ), buf -> {
                         buf.writeBlockPos(blockPos);
