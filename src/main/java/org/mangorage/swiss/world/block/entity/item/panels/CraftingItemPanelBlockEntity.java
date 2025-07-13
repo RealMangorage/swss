@@ -1,0 +1,60 @@
+package org.mangorage.swiss.world.block.entity.item.panels;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
+import org.mangorage.swiss.registry.SWISSBlockEntities;
+import org.mangorage.swiss.screen.panels.craftingpanel.CraftingPanelMenu;
+import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelMenu;
+import org.mangorage.swiss.screen.util.HasMenu;
+import org.mangorage.swiss.storage.device.DeviceType;
+import org.mangorage.swiss.storage.device.ItemDevice;
+import org.mangorage.swiss.world.block.entity.TickingBlockEntity;
+import org.mangorage.swiss.world.block.entity.base.BaseStorageBlockEntity;
+
+public final class CraftingItemPanelBlockEntity extends BaseStorageBlockEntity implements TickingBlockEntity, ItemDevice, HasMenu {
+
+    private int ticks = 0;
+    private int visibleRows = 3;
+
+    public CraftingItemPanelBlockEntity(BlockPos pos, BlockState blockState) {
+        super(SWISSBlockEntities.CRAFTING_ITEM_PANEL_BLOCK_ENTITY.get(), pos, blockState);
+    }
+
+    @Override
+    public void tickServer() {
+        ticks++;
+        if (ticks % 20 == 0) {
+            connectToNetwork(); // Connect if we havent already done so...
+        }
+    }
+
+    public int getVisibleRows() {
+        return visibleRows;
+    }
+
+    @Override
+    public IItemHandler getItemHandler() {
+        return null;
+    }
+
+    @Override
+    public boolean canInsert(DeviceType type) {
+        return false;
+    }
+
+    @Override
+    public boolean canExtract(DeviceType type) {
+        return false;
+    }
+
+    @Override
+    public void openMenu(Player player) {
+        player.openMenu(new SimpleMenuProvider(
+                (windowId, playerInventory, playerEntity) -> new CraftingPanelMenu(windowId, playerInventory, getBlockPos()),
+                Component.literal("Crafting Panel")), (buf -> buf.writeBlockPos(getBlockPos())));
+    }
+}

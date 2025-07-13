@@ -41,6 +41,11 @@ public final class SWISSItems {
             new Item.Properties()
     ));
 
+    public static final DeferredHolder<Item, Item> CRAFTING_ITEM_PANEL_ITEM = ITEMS.register("crafting_item_panel", () -> new BlockItem(
+            SWISSBlocks.CRAFTING_ITEM_PANEL_BLOCK.get(),
+            new Item.Properties()
+    ));
+
     public static final DeferredHolder<Item, Item> SWISS_CHEESE = ITEMS.register("swiss_cheese", () -> new Item(
             new Item.Properties()
                     .component(
@@ -69,6 +74,7 @@ public final class SWISSItems {
             .title(Component.translatable("itemGroup." + SWISS.MODID))
             .displayItems((p, o) -> {
                 o.accept(STORAGE_ITEM_INTERFACE_ITEM.get());
+                o.accept(CRAFTING_ITEM_PANEL_ITEM.get());
                 o.accept(EXPORTER_ITEM_INTERFACE_ITEM.get());
                 o.accept(IMPORTER_ITEM_INTERFACE_ITEM.get());
                 o.accept(STORAGE_ITEM_PANEL_ITEM.get());

@@ -28,6 +28,7 @@ import org.mangorage.swiss.network.Packets;
 import org.mangorage.swiss.registry.SWISSBlockEntities;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.registry.SWISSItems;
+import org.mangorage.swiss.screen.panels.craftingpanel.CraftingPanelScreen;
 import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelScreen;
 import org.mangorage.swiss.screen.MSMenuTypes;
 import org.slf4j.Logger;
@@ -86,6 +87,7 @@ public final class SWISS {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(MSMenuTypes.STORAGE_MENU.get(), StoragePanelScreen::new);
+            event.register(MSMenuTypes.CRAFTING_MENU.get(), CraftingPanelScreen::new);
             event.register(MSMenuTypes.TEST_MENU.get(), TestScreen::new);
             event.register(MSMenuTypes.SETTINGS_MENU.get(), SettingsScreen::new);
             event.register(MSMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);

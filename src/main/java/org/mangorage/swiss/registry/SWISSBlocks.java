@@ -14,6 +14,7 @@ import org.mangorage.swiss.world.block.TestBlock;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemExporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemImporterBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.interfaces.ItemInterfaceBlockEntity;
+import org.mangorage.swiss.world.block.entity.item.panels.CraftingItemPanelBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.StorageItemPanelBlockEntity;
 import org.mangorage.swiss.world.block.entity.item.panels.TestBlockEntity;
 
@@ -38,6 +39,11 @@ public final class SWISSBlocks {
     public static final DeferredHolder<Block, Block> STORAGE_ITEM_PANEL_BLOCK = BLOCKS.register("storage_item_panel", () -> new PanelNetworkBlock(
             BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
             StorageItemPanelBlockEntity::new
+    ));
+
+    public static final DeferredHolder<Block, Block> CRAFTING_ITEM_PANEL_BLOCK = BLOCKS.register("crafting_item_panel", () -> new PanelNetworkBlock(
+            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).sound(SoundType.STONE).noOcclusion(),
+            CraftingItemPanelBlockEntity::new
     ));
 
     public static final DeferredHolder<Block, Block> TEST_BLOCK = BLOCKS.register("test", () -> new TestBlock(

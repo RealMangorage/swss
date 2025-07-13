@@ -10,22 +10,29 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.config.ClientConfig;
 
-public record SyncVisibleRowsC2S(int visibleRows) implements CustomPacketPayload {
+public record SyncVisibleRowsC2S(int visibleRows, int menu) implements CustomPacketPayload {
 
     public static final Type<SyncVisibleRowsC2S> TYPE = new Type<>(SWISS.modRL("sync_visible_rows_c2s"));
 
 
     public static final IPayloadHandler<SyncVisibleRowsC2S> HANDLER = (pkt, ctx) -> {
-
         ServerPlayer player = (ServerPlayer) ctx.player();
-        int newRows = pkt.visibleRows();
 
-        player.getPersistentData().putInt("swiss_visible_rows", newRows);
+        if (pkt.menu == 1) {
+            int newRows = pkt.visibleRows();
+            player.getPersistentData().putInt("swiss_visible_rows", newRows);
+        }
+
+        if (pkt.menu == 2) {
+            int newRows = pkt.visibleRows();
+            player.getPersistentData().putInt("swiss_visible_rows_crafting", newRows);
+        }
 
     };
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncVisibleRowsC2S> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, SyncVisibleRowsC2S::visibleRows,
+            ByteBufCodecs.INT, SyncVisibleRowsC2S::menu,
             SyncVisibleRowsC2S::new
     );
 

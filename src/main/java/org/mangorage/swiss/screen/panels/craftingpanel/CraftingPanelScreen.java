@@ -1,4 +1,4 @@
-package org.mangorage.swiss.screen.panels.storagepanel;
+package org.mangorage.swiss.screen.panels.craftingpanel;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -20,21 +20,23 @@ import org.lwjgl.glfw.GLFW;
 import org.mangorage.swiss.SWISS;
 import org.mangorage.swiss.client.button.Button;
 import org.mangorage.swiss.client.button.ButtonStack;
-import org.mangorage.swiss.config.ClientConfig;
 import org.mangorage.swiss.network.MenuInteractPacketC2S;
 import org.mangorage.swiss.network.SyncVisibleRowsC2S;
 import org.mangorage.swiss.network.request.RequestNetworkItemsPacketC2S;
 import org.mangorage.swiss.registry.SWISSDataComponents;
 import org.mangorage.swiss.screen.Buttons;
-import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.storage.util.IUpdatable;
+import org.mangorage.swiss.util.MousePositionManagerUtil;
 import org.mangorage.swiss.util.MouseUtil;
 import org.mangorage.swiss.util.NumbersUtil;
 import org.mangorage.swiss.world.ItemCount;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-public final class StoragePanelScreen extends AbstractContainerScreen<StoragePanelMenu> implements IUpdatable {
+public final class CraftingPanelScreen extends AbstractContainerScreen<CraftingPanelMenu> implements IUpdatable {
 
     private EditBox searchBox;
     private List<ItemStack> allItems;
@@ -59,7 +61,7 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/item_panel_gui.png");
+            ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/crafting_panel_gui.png");
     private static final ResourceLocation ROW_SPRITE =
             ResourceLocation.fromNamespaceAndPath(SWISS.MODID,"textures/gui/interface_row.png");
     static final ResourceLocation SCROLL_SPRITE =
@@ -82,14 +84,14 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
             )
             .build();
 
-    public StoragePanelScreen(StoragePanelMenu menu, Inventory inventory, Component component) {
+    public CraftingPanelScreen(CraftingPanelMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
         this.itemsPerPage = visibleRows * COLUMNS;
         this.allItems = getAllItems();
         this.filteredItems = new ArrayList<>(allItems);
-        this.imageHeight = 175 + (visibleRows - 3) * 18;
+        this.imageHeight = 193 + (visibleRows - 3) * 18;
         this.imageWidth = 209;
-        this.inventoryLabelY = this.imageHeight - 98;
+        this.inventoryLabelY = this.imageHeight - 59;
         this.inventoryLabelX = 25;
         this.titleLabelX = 25;
         this.lastSearchText = "";
@@ -118,7 +120,7 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
         int availableHeight = windowHeight - topSectionHeight - bottomSectionHeight - searchBoxHeight - margin * 2;
 
         int maxRows = availableHeight / 18;
-        return Math.max(3, maxRows);
+        return Math.max(1, maxRows);
     }
 
     private void cycleVisibleRows(int button) {
@@ -138,8 +140,8 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
             }
         }
 
-        PacketDistributor.sendToServer(new SyncVisibleRowsC2S(currentRows, 1)); // 1 for storage panel
-        this.menu.player.getPersistentData().putInt("swiss_visible_rows", currentRows);
+        PacketDistributor.sendToServer(new SyncVisibleRowsC2S(currentRows, 2)); // 2 for Crafting Panel
+        this.menu.player.getPersistentData().putInt("swiss_visible_rows_crafting", currentRows);
         this.menu.visibleRows = currentRows;
         visibleRows = currentRows;
 
@@ -150,8 +152,8 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
     private void updateGuiLayout() {
         itemsPerPage = visibleRows * COLUMNS;
-        this.imageHeight = 175 + (visibleRows - 3) * 18;
-        this.inventoryLabelY = this.imageHeight - 98;
+        this.imageHeight = 193 + (visibleRows - 3) * 18;
+        this.inventoryLabelY = this.imageHeight - 59;
 
         assert this.minecraft != null;
         this.topPos = (this.minecraft.getWindow().getGuiScaledHeight() - this.imageHeight) / 2;
@@ -180,8 +182,10 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
         assert this.minecraft != null;
         assert this.minecraft.player != null;
+
         this.menu.addPlayerInventory(this.minecraft.player.getInventory());
         this.menu.addPlayerHotbar(this.minecraft.player.getInventory());
+        this.menu.addCraftingTable();
 
         onSearchChanged(searchBox.getValue());
         lastSearchText = searchBox.getValue();
@@ -225,7 +229,7 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
         guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, baseHeight);
 
         int tileSourceX = 0;
-        int tileSourceY = 54;
+        int tileSourceY = 25;
         int tileWidth = 209;
 
         for (int i = 0; i < extraRows; i++) {
@@ -234,8 +238,8 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
         }
 
         int bottomSourceY = baseHeight + tileHeight - 18;
-        int bottomDestY = topPos + baseHeight + (extraRows * tileHeight);
-        int bottomHeight = 101;
+        int bottomDestY = topPos + baseHeight + (extraRows * tileHeight) ;
+        int bottomHeight = 157;
 
         guiGraphics.blit(TEXTURE, leftPos, bottomDestY, 0, bottomSourceY, imageWidth, bottomHeight);
 
