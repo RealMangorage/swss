@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -117,6 +118,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
     }
 
     List<ItemStack> getNetworkItems() {
+
         return networkHolder.getNetwork()
                 .getItemDevices()
                 .filter(device -> device.isValidDevice() && device.canExtract(DeviceType.ITEM))
@@ -134,6 +136,8 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
                 .flatMap(List::stream)
                 .filter(item -> !item.isEmpty())
                 .toList();
+
+
     }
 
     @Override

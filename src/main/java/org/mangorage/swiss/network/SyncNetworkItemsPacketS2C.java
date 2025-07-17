@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.mangorage.swiss.SWISS;
+import org.mangorage.swiss.screen.panels.craftingpanel.CraftingPanelMenu;
 import org.mangorage.swiss.storage.util.IUpdatable;
 import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.screen.panels.storagepanel.StoragePanelMenu;
@@ -23,9 +24,15 @@ public record SyncNetworkItemsPacketS2C(List<ItemStack> items) implements Custom
         final var player = ctx.player();
 
         if (player instanceof LocalPlayer lp && player.containerMenu instanceof ISyncableNetworkHandler handler) {
-            handler.sync(new StoragePanelMenu.ItemList(pkt.items()));
-            if (Minecraft.getInstance().screen instanceof IUpdatable iUpdatable)
-                iUpdatable.update();
+            if (lp.containerMenu instanceof CraftingPanelMenu craftingMenu) {
+                craftingMenu.sync(new CraftingPanelMenu.ItemList(pkt.items()));
+            } else if (lp.containerMenu instanceof StoragePanelMenu storageMenu) {
+                storageMenu.sync(new StoragePanelMenu.ItemList(pkt.items()));
+            }
+
+            if (Minecraft.getInstance().screen instanceof IUpdatable updatable) {
+                updatable.update();
+            }
         }
     };
 

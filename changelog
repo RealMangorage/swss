@@ -1,5 +1,8 @@
 Changelog SWISS
 
+1.0.2
+Fixed to server side not allowing panel to be opened
+
 1.0.1
 Removed placement check and replace with canSurvive check
 
