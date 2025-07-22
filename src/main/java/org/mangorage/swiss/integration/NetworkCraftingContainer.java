@@ -2,12 +2,24 @@ package org.mangorage.swiss.integration;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
 public class NetworkCraftingContainer implements CraftingContainer {
+
+    private final ItemStack[] items;
+
+    public NetworkCraftingContainer(AbstractContainerMenu menu) {
+        //super(menu, 3, 3);
+        this.items = new ItemStack[9];
+        for (int i = 0; i < items.length; i++) {
+            items[i] = ItemStack.EMPTY;
+        }
+    }
+
     @Override
     public int getWidth() {
         return 3;
@@ -30,8 +42,10 @@ public class NetworkCraftingContainer implements CraftingContainer {
 
     @Override
     public boolean isEmpty() {
-        return false;
-    }
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) return false;
+        }
+        return true;    }
 
     @Override
     public ItemStack getItem(int i) {
