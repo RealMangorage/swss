@@ -19,6 +19,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
+import org.mangorage.swiss.integration.NetworkCraftingContainer;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
 import org.mangorage.swiss.registry.SWISSBlocks;
 import org.mangorage.swiss.screen.MSMenuTypes;
@@ -49,7 +50,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
     public int visibleRows;
     private CraftingItemPanelBlockEntity blockEntity;
 
-    private final CraftingContainer craftMatrix = new Crafting(this, 3, 3);
+    private final CraftingContainer craftMatrix = new NetworkCraftingContainer();
     private final SimpleContainer craftResult = new SimpleContainer(1);
 
     public CraftingPanelMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
