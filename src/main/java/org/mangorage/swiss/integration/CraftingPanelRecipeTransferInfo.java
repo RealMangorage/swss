@@ -35,16 +35,12 @@ public class CraftingPanelRecipeTransferInfo implements IRecipeTransferInfo<Craf
 
     @Override
     public @NotNull List<Slot> getRecipeSlots(CraftingPanelMenu menu, RecipeHolder<CraftingRecipe> recipe) {
-        return menu.getCraftingSlots(); // crafting grid
+        return menu.slots.subList(37, 46);
     }
 
     @Override
     public @NotNull List<Slot> getInventorySlots(CraftingPanelMenu menu, RecipeHolder<CraftingRecipe> recipe) {
-        List<Slot> inventorySlots = new ArrayList<>();
-        for (int i = 10; i <= 45; i++) { // include slot 45
-            inventorySlots.add(menu.getSlot(i));
-        }
-        return inventorySlots;
+        return menu.slots.subList(0, 35);
     }
 
     @Override

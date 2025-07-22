@@ -17,6 +17,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.items.ItemHandlerCopySlot;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.swiss.StorageNetworkManager;
 import org.mangorage.swiss.network.SyncNetworkItemsPacketS2C;
@@ -32,12 +34,14 @@ import org.mangorage.swiss.storage.network.ISyncableNetworkHandler;
 import org.mangorage.swiss.storage.network.Network;
 import org.mangorage.swiss.storage.network.NetworkInfo;
 import org.mangorage.swiss.storage.network.Permission;
+import org.mangorage.swiss.storage.network.UnknownNetwork;
 import org.mangorage.swiss.storage.util.IPacketRequest;
 import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import org.mangorage.swiss.util.ClientCraftingGrid;
 import org.mangorage.swiss.world.block.entity.item.panels.CraftingItemPanelBlockEntity;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CraftingPanelMenu extends AbstractContainerMenu implements ISyncableNetworkHandler, IPacketRequest, Interact {
 
@@ -70,6 +74,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
         addCraftingTable();
+
     }
 
     private boolean isFillingFromNetwork = false;
@@ -363,7 +368,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
 
 
     public List<Slot> getCraftingSlots() {
-        return slots.subList(1, 10);
+        return slots.subList(0, 10);
     }
 
 
@@ -373,7 +378,11 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
     }
 
     public void addCraftingTable() {
+
         this.addSlot(new ResultSlot(player, craftMatrix, craftResult, 0, 151 , 42 + (visibleRows * 18) ));
+
+
+        System.out.println("Slot C " + this.slots.size());
 
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 3; ++col) {
@@ -381,6 +390,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
                 this.addSlot(new Slot(craftMatrix, index, 43 + col * 18, 24 + (visibleRows * 18)  + row * 18));
             }
         }
+
     }
 
     public void addPlayerInventory(Inventory playerInventory) {
