@@ -77,7 +77,6 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
     @Override
     public void slotsChanged(Container inventory) {
         if (inventory == craftMatrix) {
-            System.out.println("Triggered slotsChanged for crafting matrix");
             updateCraftingResult();
 
             if (!level.isClientSide()) {
@@ -364,15 +363,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
 
 
     public List<Slot> getCraftingSlots() {
-        List<Slot> result = new ArrayList<>();
-        // Result slot is at index 0, crafting grid starts at index 1
-        for (int i = 1; i <= 9; i++) {
-            Slot slot = this.getSlot(i);
-            if (slot.container == craftMatrix) {
-                result.add(slot);
-            }
-        }
-        return result;
+        return slots.subList(1, 10);
     }
 
 

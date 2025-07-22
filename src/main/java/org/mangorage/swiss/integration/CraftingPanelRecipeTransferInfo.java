@@ -41,8 +41,7 @@ public class CraftingPanelRecipeTransferInfo implements IRecipeTransferInfo<Craf
     @Override
     public @NotNull List<Slot> getInventorySlots(CraftingPanelMenu menu, RecipeHolder<CraftingRecipe> recipe) {
         List<Slot> inventorySlots = new ArrayList<>();
-        for (int i = 10; i < 46; i++) {
-            if (i == 36) continue; // Exclude invalid slot
+        for (int i = 10; i <= 45; i++) { // include slot 45
             inventorySlots.add(menu.getSlot(i));
         }
         return inventorySlots;
