@@ -35,7 +35,7 @@ public class CraftingPanelRecipeTransferInfo implements IRecipeTransferInfo<Craf
 
     @Override
     public @NotNull List<Slot> getRecipeSlots(CraftingPanelMenu menu, RecipeHolder<CraftingRecipe> recipe) {
-        return menu.slots.subList(1, 10); // crafting grid
+        return menu.getCraftingSlots(); // crafting grid
     }
 
     @Override
