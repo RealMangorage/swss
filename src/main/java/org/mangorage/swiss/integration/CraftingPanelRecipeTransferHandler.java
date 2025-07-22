@@ -59,7 +59,7 @@ public class CraftingPanelRecipeTransferHandler implements IRecipeTransferHandle
             return null;
         }
 
-        PacketDistributor.sendToServer(new SyncRecipePacketC2S(recipeHolder.id()));
+        PacketDistributor.sendToServer(new SyncRecipePacketC2S(recipeHolder.id(), maxTransfer));
 
         return null;
     }

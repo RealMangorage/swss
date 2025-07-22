@@ -20,17 +20,16 @@ import org.mangorage.swiss.storage.util.ItemHandlerLookup;
 import java.util.List;
 import java.util.Optional;
 
-public record SyncRecipePacketC2S(ResourceLocation recipeID) implements CustomPacketPayload {
+public record SyncRecipePacketC2S(ResourceLocation recipeID, boolean maxTransfer) implements CustomPacketPayload {
 
     public static final Type<SyncRecipePacketC2S> TYPE = new Type<>(SWISS.modRL("sync_recipe_c2s"));
-
 
     public static final IPayloadHandler<SyncRecipePacketC2S> HANDLER = (pkt, ctx) -> {
         ServerPlayer player = (ServerPlayer) ctx.player();
 
         if (player.containerMenu instanceof CraftingPanelMenu menu) {
             MinecraftServer server = player.server;
-            Optional<? extends RecipeHolder<?>> optional = server.getRecipeManager().byKey(pkt.recipeID);
+            Optional<? extends RecipeHolder<?>> optional = server.getRecipeManager().byKey(pkt.recipeID());
 
             if (optional.isPresent() && optional.get().value() instanceof CraftingRecipe recipe) {
                 if (menu.getNetworkHolder() == null || menu.getNetworkHolder().getNetwork() == null) {
@@ -67,7 +66,8 @@ public record SyncRecipePacketC2S(ResourceLocation recipeID) implements CustomPa
                     ItemStack extracted = ItemStack.EMPTY;
 
                     for (ItemStack possibleMatch : ingredient.getItems()) {
-                        extracted = extractor.findAny(possibleMatch.getItem(), 1);
+                        int count = pkt.maxTransfer() ? Math.min(possibleMatch.getMaxStackSize(), menu.craftMatrix.getMaxStackSize()) : 1;
+                        extracted = extractor.findAny(possibleMatch.getItem(), count);
                         if (!extracted.isEmpty()) {
                             break;
                         }
@@ -92,21 +92,18 @@ public record SyncRecipePacketC2S(ResourceLocation recipeID) implements CustomPa
                 menu.slotsChanged(menu.craftMatrix);
             }
         }
-
     };
-
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncRecipePacketC2S> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC,
             SyncRecipePacketC2S::recipeID,
+            ByteBufCodecs.BOOL,
+            SyncRecipePacketC2S::maxTransfer,
             SyncRecipePacketC2S::new
     );
-
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
-
-
 }
