@@ -27,6 +27,7 @@ import org.mangorage.swiss.screen.MSMenuTypes;
 import org.mangorage.swiss.screen.interfaces.config_block.ConfigureBlockNetworkMenu;
 import org.mangorage.swiss.screen.misc.setting.SettingsMenu;
 import org.mangorage.swiss.screen.util.Interact;
+import org.mangorage.swiss.screen.util.RefillableResultSlot;
 import org.mangorage.swiss.storage.device.DeviceType;
 import org.mangorage.swiss.storage.device.INetworkHolder;
 import org.mangorage.swiss.storage.device.ItemDevice;
@@ -53,11 +54,15 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
     public int visibleRows;
     private CraftingItemPanelBlockEntity blockEntity;
 
-    private final CraftingContainer craftMatrix = new TransientCraftingContainer(this, 3, 3);
+    public final CraftingContainer craftMatrix = new TransientCraftingContainer(this, 3, 3);
     private final SimpleContainer craftResult = new SimpleContainer(1);
 
     public CraftingPanelMenu(int containerID, Inventory inventory, FriendlyByteBuf extraData) {
         this(containerID, inventory, extraData.readBlockPos());
+    }
+
+    public INetworkHolder getNetworkHolder() {
+        return networkHolder;
     }
 
     public CraftingPanelMenu(int containerID, Inventory inventory, BlockPos blockPos) {
@@ -76,8 +81,6 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
         addCraftingTable();
 
     }
-
-    private boolean isFillingFromNetwork = false;
 
     @Override
     public void slotsChanged(Container inventory) {
@@ -319,6 +322,8 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
         }
     }
 
+
+
     public void fillCraftingGridFromNetwork() {
         if (networkHolder == null) return;
 
@@ -329,7 +334,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
                 .getRecipeFor(RecipeType.CRAFTING, input, level);
 
         if (optionalRecipe.isEmpty()) {
-            return; // no valid recipe
+            return;
         }
 
         CraftingRecipe recipe = optionalRecipe.get().value();
@@ -340,7 +345,6 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
 
         for (int slot = 0; slot < ingredients.size(); slot++) {
             if (!craftMatrix.getItem(slot).isEmpty()) {
-                // Skip slots already filled by player
                 continue;
             }
 
@@ -368,7 +372,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
 
 
     public List<Slot> getCraftingSlots() {
-        return slots.subList(0, 10);
+        return slots.subList(37, 46);
     }
 
 
@@ -379,7 +383,7 @@ public final class CraftingPanelMenu extends AbstractContainerMenu implements IS
 
     public void addCraftingTable() {
 
-        this.addSlot(new ResultSlot(player, craftMatrix, craftResult, 0, 151 , 42 + (visibleRows * 18) ));
+        this.addSlot(new RefillableResultSlot(player, craftMatrix, craftResult, 0, 151, 42 + (visibleRows * 18), this));
 
 
         System.out.println("Slot C " + this.slots.size());

@@ -1,6 +1,7 @@
 Changelog SWISS
 
 1.0.3
+Jei quick crafting works only for items in the player inventory
 
 1.0.2
 Fixed to server side not allowing panel to be opened

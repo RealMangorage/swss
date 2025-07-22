@@ -13,7 +13,8 @@ public final class Packets {
                 .playToServer(CreateNetworkPacketC2S.TYPE, CreateNetworkPacketC2S.STREAM_CODEC, CreateNetworkPacketC2S.HANDLER)
                 .playToServer(JoinNetworkPacketC2S.TYPE, JoinNetworkPacketC2S.STREAM_CODEC, JoinNetworkPacketC2S.HANDLER)
                 .playToServer(SyncFilterItemsPacketC2S.TYPE, SyncFilterItemsPacketC2S.STREAM_CODEC, SyncFilterItemsPacketC2S.HANDLER)
-                .playToServer(SyncVisibleRowsC2S.TYPE, SyncVisibleRowsC2S.STREAM_CODEC, SyncVisibleRowsC2S.HANDLER);
+                .playToServer(SyncVisibleRowsC2S.TYPE, SyncVisibleRowsC2S.STREAM_CODEC, SyncVisibleRowsC2S.HANDLER)
+                .playToServer(SyncRecipePacketC2S.TYPE, SyncRecipePacketC2S.STREAM_CODEC, SyncRecipePacketC2S.HANDLER);
 
     }
 }
