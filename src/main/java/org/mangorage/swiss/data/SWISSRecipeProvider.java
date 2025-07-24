@@ -20,6 +20,16 @@ public final class SWISSRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes(RecipeOutput consumer) {
 
+        //Crafting Panel
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SWISSItems.CRAFTING_ITEM_PANEL_ITEM.get(), 1)
+                .pattern("ABA")
+                .pattern("BCB")
+                .pattern("ABA")
+                .define('A', Tags.Items.INGOTS_IRON)
+                .define('B', Tags.Items.PLAYER_WORKSTATIONS_CRAFTING_TABLES)
+                .define('C', SWISSItems.STORAGE_ITEM_PANEL_ITEM.get())
+                .unlockedBy("has_item", has(Tags.Items.GEMS_DIAMOND)).save(consumer);
+
         //Item Panel
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, SWISSItems.STORAGE_ITEM_PANEL_ITEM.get(), 1)
                 .pattern("ABA")

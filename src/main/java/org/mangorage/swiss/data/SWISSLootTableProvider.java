@@ -22,6 +22,7 @@ public class SWISSLootTableProvider extends VanillaBlockLoot {
         this.dropSelf(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get());
         this.dropSelf(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get());
         this.dropSelf(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get());
+        this.dropSelf(SWISSBlocks.CRAFTING_ITEM_PANEL_BLOCK.get());
 
     }
 

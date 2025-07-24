@@ -1,4 +1,5 @@
 {
+  "block.swiss.crafting_item_panel": "Crafting Storage Panel",
   "block.swiss.exporter_item_interface": "Item Exporter Interface",
   "block.swiss.importer_item_interface": "Item Importer Interface",
   "block.swiss.storage_item_interface": "Item Storage Interface",

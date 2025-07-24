@@ -24,6 +24,7 @@ public final class SWISSLangProvider extends LanguageProvider {
         addBlock(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK, "Item Importer Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK, "Item Storage Interface");
         addBlock(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK, "Item Storage Panel");
+        addBlock(SWISSBlocks.CRAFTING_ITEM_PANEL_BLOCK, "Crafting Storage Panel");
 
         addItem(SWISSItems.SWISS_CHEESE, "Swiss Cheese");
 

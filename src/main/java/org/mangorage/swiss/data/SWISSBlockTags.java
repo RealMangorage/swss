@@ -26,6 +26,7 @@ public final class SWISSBlockTags extends BlockTagsProvider {
                 .add(SWISSBlocks.STORAGE_ITEM_INTERFACE_BLOCK.get())
                 .add(SWISSBlocks.IMPORTER_ITEM_INTERFACE_BLOCK.get())
                 .add(SWISSBlocks.STORAGE_ITEM_PANEL_BLOCK.get())
+                .add(SWISSBlocks.CRAFTING_ITEM_PANEL_BLOCK.get())
                 ;
         // Add block tags here if needed
     }
