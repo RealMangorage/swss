@@ -1,5 +1,9 @@
 Changelog SWISS
 
+1.0.6
+Item stacks with components now render correctly in the crafting an item panel screen
+Scrolling now sort of works but still not correct better than before
+
 1.0.3
 Jei quick crafting works only for items in the player inventory
 

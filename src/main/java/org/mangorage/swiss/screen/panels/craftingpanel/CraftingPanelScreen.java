@@ -191,24 +191,35 @@ public final class CraftingPanelScreen extends AbstractContainerScreen<CraftingP
         lastSearchText = searchBox.getValue();
     }
 
-
     private void onSearchChanged(String text) {
-        lastSearchText = text;
-        Map<Item, Integer> itemCounts = new LinkedHashMap<>();
-        for (ItemStack stack : allItems) {
-            itemCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+        if (!text.equals(lastSearchText)) {
+            lastSearchText = text;
+            scrollIndex = 0;  // reset scroll only on new search
         }
 
-        filteredItems = itemCounts.entrySet().stream()
-                .filter(entry -> entry.getKey().getDescription().getString().toLowerCase().contains(text.toLowerCase()))
-                .map(entry -> {
-                    ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
-                    stack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(entry.getValue()));
-                    return stack;
-                })
-                .toList();
+        this.filteredItems = combineItemStacks(
+                allItems.stream()
+                        .filter(stack -> stack.getHoverName().getString().toLowerCase().contains(text.toLowerCase()))
+                        .toList()
+        );
+    }
 
-        scrollIndex = 0;
+    private List<ItemStack> combineItemStacks(List<ItemStack> input) {
+        Map<String, ItemStack> combinedMap = new LinkedHashMap<>();
+
+        for (ItemStack stack : input) {
+            if (stack.isEmpty()) continue;
+
+            String key = stack.getItem().getDescriptionId() + "|" + stack.getDamageValue() + "|" + stack.getComponents();
+
+            if (combinedMap.containsKey(key)) {
+                combinedMap.get(key).grow(stack.getCount());
+            } else {
+                combinedMap.put(key, stack.copy());
+            }
+        }
+
+        return new ArrayList<>(combinedMap.values());
     }
 
     @Override
@@ -299,6 +310,9 @@ public final class CraftingPanelScreen extends AbstractContainerScreen<CraftingP
             }
 
             guiGraphics.renderItem(stack, x, y);
+            if (stack.getCount() == 1) {
+                guiGraphics.renderItemDecorations(font, stack, x, y);
+            }
             renderAmount(guiGraphics, x, y, NumbersUtil.format(stack.getCount()), 0xFFFFFF);
         }
 
@@ -427,19 +441,36 @@ public final class CraftingPanelScreen extends AbstractContainerScreen<CraftingP
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (searchBox != null && searchBox.isMouseOver(mouseX, mouseY)) return false;
+
         int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
-        if (maxScroll > 0) {
-            // Scroll by whole rows
-            int newScrollIndex = scrollIndex - (int) scrollY * COLUMNS;
-            // Clamp within bounds
-            newScrollIndex = Mth.clamp(newScrollIndex, 0, maxScroll);
-            // Snap to multiple of COLUMNS (whole rows)
-            scrollIndex = (newScrollIndex / COLUMNS) * COLUMNS;
+
+        int maxScrollRowStart;
+        if (maxScroll < COLUMNS) {
+            maxScrollRowStart = maxScroll;
+        } else {
+            maxScrollRowStart = (maxScroll / COLUMNS) * COLUMNS;
+        }
+
+        int newScrollIndex = scrollIndex - (int) scrollY * COLUMNS;
+        newScrollIndex = Mth.clamp(newScrollIndex, 0, maxScrollRowStart);
+
+        if (newScrollIndex != scrollIndex) {
+            scrollIndex = newScrollIndex;
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+
+        return false;
     }
 
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (isDraggingScrollbar) {
+            isDraggingScrollbar = false;
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

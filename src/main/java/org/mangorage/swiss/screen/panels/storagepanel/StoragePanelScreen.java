@@ -112,7 +112,7 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
         int topSectionHeight = 72;
         int bottomSectionHeight = 101;
-        int searchBoxHeight = 20;
+        int searchBoxHeight = 52;
         int margin = 10;
 
         int availableHeight = windowHeight - topSectionHeight - bottomSectionHeight - searchBoxHeight - margin * 2;
@@ -145,8 +145,6 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
         updateGuiLayout();
     }
-
-
 
     private void updateGuiLayout() {
         itemsPerPage = visibleRows * COLUMNS;
@@ -183,28 +181,39 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
         this.menu.addPlayerInventory(this.minecraft.player.getInventory());
         this.menu.addPlayerHotbar(this.minecraft.player.getInventory());
 
-        onSearchChanged(searchBox.getValue());
-        lastSearchText = searchBox.getValue();
+        onSearchChanged(searchBox.getValue()); // this no longer resets scrollIndex if text is unchanged
     }
 
 
     private void onSearchChanged(String text) {
-        lastSearchText = text;
-        Map<Item, Integer> itemCounts = new LinkedHashMap<>();
-        for (ItemStack stack : allItems) {
-            itemCounts.merge(stack.getItem(), stack.getCount(), Integer::sum);
+        if (!text.equals(lastSearchText)) {
+            lastSearchText = text;
+            scrollIndex = 0;  // reset scroll only on new search
         }
 
-        filteredItems = itemCounts.entrySet().stream()
-                .filter(entry -> entry.getKey().getDescription().getString().toLowerCase().contains(text.toLowerCase()))
-                .map(entry -> {
-                    ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
-                    stack.set(SWISSDataComponents.ITEM_COUNT.get(), new ItemCount(entry.getValue()));
-                    return stack;
-                })
-                .toList();
+        this.filteredItems = combineItemStacks(
+                allItems.stream()
+                        .filter(stack -> stack.getHoverName().getString().toLowerCase().contains(text.toLowerCase()))
+                        .toList()
+        );
+    }
 
-        scrollIndex = 0;
+    private List<ItemStack> combineItemStacks(List<ItemStack> input) {
+        Map<String, ItemStack> combinedMap = new LinkedHashMap<>();
+
+        for (ItemStack stack : input) {
+            if (stack.isEmpty()) continue;
+
+            String key = stack.getItem().getDescriptionId() + "|" + stack.getDamageValue() + "|" + stack.getComponents();
+
+            if (combinedMap.containsKey(key)) {
+                combinedMap.get(key).grow(stack.getCount());
+            } else {
+                combinedMap.put(key, stack.copy());
+            }
+        }
+
+        return new ArrayList<>(combinedMap.values());
     }
 
     @Override
@@ -294,7 +303,11 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
                 selected = ItemStack.EMPTY;
             }
 
+
             guiGraphics.renderItem(stack, x, y);
+            if (stack.getCount() == 1) {
+                guiGraphics.renderItemDecorations(font, stack, x, y);
+            }
             renderAmount(guiGraphics, x, y, NumbersUtil.format(stack.getCount()), 0xFFFFFF);
         }
 
@@ -403,6 +416,29 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (searchBox != null && searchBox.isMouseOver(mouseX, mouseY)) return false;
+
+        int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
+
+        int maxScrollRowStart;
+        if (maxScroll < COLUMNS) {
+            maxScrollRowStart = maxScroll;
+        } else {
+            maxScrollRowStart = (maxScroll / COLUMNS) * COLUMNS;
+        }
+        int newScrollIndex = scrollIndex - (int) scrollY * COLUMNS;
+        newScrollIndex = Mth.clamp(newScrollIndex, 0, maxScrollRowStart);
+
+        if (newScrollIndex != scrollIndex) {
+            scrollIndex = newScrollIndex;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (isDraggingScrollbar) {
             int scrollbarY = topPos + SCROLLBAR_Y_OFFSET;
@@ -410,9 +446,10 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
             int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
 
             int relativeY = (int) mouseY - scrollbarY - dragOffsetY;
-            float percent = Mth.clamp(relativeY / (float)(getScrollbarHeight() - handleHeight), 0.0F, 1.0F);
+            float scrollbarHeight = getScrollbarHeight() - handleHeight;
 
-            int rawIndex = (int)(percent * maxScroll);
+            float percent = Mth.clamp(relativeY / scrollbarHeight, 0.0F, 1.0F);
+            int rawIndex = (int) (percent * maxScroll);
             scrollIndex = Mth.clamp((rawIndex / COLUMNS) * COLUMNS, 0, maxScroll);
 
             return true;
@@ -420,22 +457,6 @@ public final class StoragePanelScreen extends AbstractContainerScreen<StoragePan
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        int maxScroll = Math.max(0, filteredItems.size() - itemsPerPage);
-        if (maxScroll > 0) {
-            // Scroll by whole rows
-            int newScrollIndex = scrollIndex - (int) scrollY * COLUMNS;
-            // Clamp within bounds
-            newScrollIndex = Mth.clamp(newScrollIndex, 0, maxScroll);
-            // Snap to multiple of COLUMNS (whole rows)
-            scrollIndex = (newScrollIndex / COLUMNS) * COLUMNS;
-            return true;
-        }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-    }
-
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
